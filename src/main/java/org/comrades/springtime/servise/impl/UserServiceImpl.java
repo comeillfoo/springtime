@@ -2,10 +2,13 @@ package org.comrades.springtime.servise.impl;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
 import org.comrades.springtime.dao.UserRepository;
+import org.comrades.springtime.module.RoleEnum;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -23,6 +26,11 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found by token: " + token);
         }
         return user;
+    }
+
+    @Override
+    public List<User> findUserByRole(RoleEnum role) {
+        return userRepository.findUserByRole(role);
     }
 
     @Override
