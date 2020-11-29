@@ -1,9 +1,8 @@
-package org.comrades.springtime.module.impl;
+package org.comrades.springtime.servise.impl;
 
 import org.comrades.springtime.dao.DotRepository;
 import org.comrades.springtime.module.Dot;
-import org.comrades.springtime.module.User;
-import org.comrades.springtime.module.servise.DotService;
+import org.comrades.springtime.servise.DotService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class DotServiceImpl implements DotService {

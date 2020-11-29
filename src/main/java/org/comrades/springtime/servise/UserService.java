@@ -1,9 +1,7 @@
-package org.comrades.springtime.module.servise;
+package org.comrades.springtime.servise;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
-import org.comrades.springtime.dao.UserRepository;
 import org.comrades.springtime.module.User;
-import org.springframework.data.repository.CrudRepository;
 
 
 public interface UserService {

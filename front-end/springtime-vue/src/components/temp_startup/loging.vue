@@ -31,7 +31,8 @@
         },
       };
     },
-    
+
+
     methods: {
       signin: function(event) {
         props['authorized'] = true;
