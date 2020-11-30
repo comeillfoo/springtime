@@ -1,6 +1,7 @@
 package org.comrades.springtime.module;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -19,7 +20,9 @@ public abstract class UserBaseEntity {
     }
 
     @Column(name = "name")
+    @NonNull
     private String name;
     @Column(name = "password")
+    @NonNull
     private String password;
 }

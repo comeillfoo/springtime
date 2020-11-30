@@ -73,7 +73,7 @@ public class AuthorizationController {
         }
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/sign_in")
     public ResponseEntity signIn(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
         Map<Object, Object> response = new HashMap<>();
         try {

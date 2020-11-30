@@ -1,55 +1,75 @@
 package org.comrades.springtime.controller;
 
 
+import org.comrades.springtime.dao.DotRepository;
+import org.comrades.springtime.module.Dot;
+import org.comrades.springtime.module.User;
+import org.comrades.springtime.module.requested.DotDto;
+import org.comrades.springtime.servise.DotService;
+import org.comrades.springtime.servise.UserService;
+import org.comrades.springtime.servise.impl.DotServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/**")
+@RequestMapping("/main/app/**")
 public class MainController {
-//    @Autowired
-//    private MessageRepo messageRepo;
 
-    @GetMapping("/")
-    public String greeting(Map<String, Object> model) {
-        return "login";
+    private final DotService dotService;
+    private final UserService userService;
+
+    @Autowired
+    public MainController(DotService dotService, UserService userService) {
+        this.dotService = dotService;
+        this.userService = userService;
     }
 
-    @GetMapping("/main")
-    public String main(Map<String, Object> model) {
-//        Iterable<Message> messages = messageRepo.findAll();
+    @PostMapping("/add")
+    public ResponseEntity add(@RequestParam DotDto dotDto) {
+        Map<Object, Object> response = new HashMap<>();
 
-//        model.put("messages", messages);
+        Dot dot = new Dot();
 
-        return "main";
+        dot.setX(dotDto.getX());
+        dot.setY(dotDto.getY());
+        dot.setR(dotDto.getR());
+
+        try {
+            dotService.validate(dot);
+        }catch (NumberFormatException | NullPointerException ex) {
+            response.put("perpose", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+        }
+
+        User user = userService.getCurrentUser();
+        dot.setUser(user);
+
+        dotService.checkDots(dot);
+        dotService.saveDot(dot);
+
+        return ResponseEntity.ok(Collections.singleton(dot));
     }
 
-    @PostMapping("/main")
-    public String add(@RequestParam String text, @RequestParam String tag, Map<String, Object> model) {
-//        Message message = new Message(text, tag);
+    @PostMapping("/clear")
+    public ResponseEntity clear() {
+        User user = userService.getCurrentUser();
+        dotService.clearByUser(user);
 
-//        messageRepo.save(message);
-
-//        Iterable<Message> messages = messageRepo.findAll();
-
-//        model.put("messages", messages);
-
-        return "main";
+        return ResponseEntity.ok("");
     }
 
-    @PostMapping("filter")
-    public String filter(@RequestParam String filter, Map<String, Object> model) {
-//        Iterable<Message> messages;
+    @GetMapping("/dots/all")
+    public ResponseEntity getEveryDot() {
+        User user = userService.getCurrentUser();
+        List<Dot> dotList = dotService.getDotsByUser(user);
 
-//        if (filter != null && !filter.isEmpty()) {
-//            messages = messageRepo.findByTag(filter);
-//        } else {
-//            messages = messageRepo.findAll();
-//        }
-
-//        model.put("messages", messages);
-
-        return "main";
+        return ResponseEntity.ok(dotList);
     }
 }

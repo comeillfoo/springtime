@@ -5,6 +5,9 @@ import org.comrades.springtime.dao.UserRepository;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,6 +70,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public User saveUser(User user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        User user = null;
+
+        try {
+            user =userRepository.findUserByName(userName);
+        }catch (UserNotFoundException ex) { /*NOPE*/}
+
+        return user;
     }
 
     @Override
