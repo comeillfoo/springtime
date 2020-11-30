@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <logo />
-    <basic v-bind:authorized="session.isAuthorized" v-bind:token="session.token" v-if="session.isAuthorized" />
-    <startup v-bind:authorized="session.isAuthorized" v-bind:token="session.token" v-else />
+    <basic :token="token" @update:token="update" v-if="isAuthorized" />
+    <startup @update:token="update" v-else />
   </div>
 </template>
 
@@ -13,19 +13,26 @@
 
   export default {
     name: 'app',
-    data: function() {
-      return {
-        session: {
-          token: '',
-          isAuthorized: false,
-        },
-      };
-    },
     components: {
       logo,
       startup,
       basic,
     },
+    data: function() {
+      return {
+        token: '',
+      }
+    },
+    methods: {
+      update(value) {
+        this.token = value;
+      }
+    },
+    computed: {
+      isAuthorized: function() {
+        return !((this.token === undefined) || (this.token === null) || (this.token === ''));
+      }
+    }
   }
 </script>
 
