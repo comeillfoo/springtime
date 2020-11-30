@@ -13,6 +13,7 @@ public class Dot extends DotBaseEntity {
 
     @Id
     @Column(name = "dot_id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long dotId;
 
     @ManyToOne()

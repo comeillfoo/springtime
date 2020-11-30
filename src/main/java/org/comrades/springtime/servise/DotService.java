@@ -1,9 +1,13 @@
 package org.comrades.springtime.servise;
 
 import org.comrades.springtime.module.Dot;
+import org.comrades.springtime.module.User;
+
+import java.util.List;
 
 public interface DotService {
 
-    Dot createDot(Long dotId, Integer x, Integer y, Integer r, Boolean isHit);
-    void saveDot(Dot dot);
+    List<Dot> findDotsByUser(User user);
+
+    Dot saveDot(Dot dot);
 }
