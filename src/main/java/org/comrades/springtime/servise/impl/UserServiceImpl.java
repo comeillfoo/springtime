@@ -20,7 +20,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(String login) throws UserNotFoundException {
-        return userRepository.findUserByName(login);
+        User user;
+
+        try {
+            user = userRepository.findUserByName(login);
+        }catch (UserNotFoundException ex) {
+            //TODO: log UserNotFoundException
+            throw new UserNotFoundException(ex.getMessage());
+        }
+        return user;
     }
 
     @Override
@@ -29,6 +37,20 @@ public class UserServiceImpl implements UserService {
 
         try {
             user = userRepository.findUserByUID(id);
+        }catch (UserNotFoundException ex) {
+            //TODO: log UserNotFoundException
+            throw new UserNotFoundException(ex.getMessage());
+        }
+
+        return user;
+    }
+
+    @Override
+    public User findByRefreshToken(String refreshToken) throws UserNotFoundException {
+        User user;
+
+        try {
+            user = userRepository.findUserByRefreshToken(refreshToken);
         }catch (UserNotFoundException ex) {
             //TODO: log UserNotFoundException
             throw new UserNotFoundException(ex.getMessage());

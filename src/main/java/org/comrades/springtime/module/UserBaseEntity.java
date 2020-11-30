@@ -11,6 +11,13 @@ import javax.persistence.MappedSuperclass;
 @Setter
 public abstract class UserBaseEntity {
 
+    public UserBaseEntity() {}
+
+    public UserBaseEntity(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+
     @Column(name = "name")
     private String name;
     @Column(name = "password")

@@ -8,8 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 public interface Tokenable {
 
     String generateRefreshToken(User user);
+    String generateAccessToken(User user);
 
     String resolveToken(HttpServletRequest req) throws TokenNotProvidedException;
+    boolean validateToken(String token);
 
     String getUsername(String token);
 }

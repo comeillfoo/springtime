@@ -27,7 +27,7 @@ public class JwtFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-        String token = "";
+        String token = null;
 
         try {
             token = tokenHandler.resolveToken((HttpServletRequest) servletRequest);
@@ -35,10 +35,12 @@ public class JwtFilter extends GenericFilterBean {
             //TODO: log TokenNotProvidedException , think about actions
         }
 
-        Authentication auth = tokenHandler.getAuthentication(token);
+        if (token != null && tokenHandler.validateToken(token)) {
+            Authentication auth = tokenHandler.getAuthentication(token);
 
-        if (auth != null) {
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if (auth != null) {
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
         }
 
         filterChain.doFilter(servletRequest, servletResponse);

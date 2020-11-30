@@ -12,6 +12,8 @@ public interface UserService {
 
     User findByUserId(Long id) throws UserNotFoundException;
 
+    User findByRefreshToken(String refreshToken) throws UserNotFoundException;
+
     void delete(Long id) throws UserNotFoundException;
 
     User saveUser(User user);

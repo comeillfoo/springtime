@@ -13,12 +13,18 @@ import java.util.List;
 @Table(name = "users")
 public class User extends UserBaseEntity{
 
+    public User() {}
+
+    public User(String login, String password) {
+        super(login, password);
+    }
+
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long UID;
-    @Column(name = "token")
-    private String token;
+    @Column(name = "refresh_token")
+    private String refreshToken;
 
     @OneToMany(mappedBy = "user")
     private List<Dot> dotList;
