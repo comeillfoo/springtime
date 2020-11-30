@@ -30,7 +30,8 @@
         },
       };
     },
-    
+
+
     methods: {
       signin: async function(event) {
         console.log('sign in account:');
