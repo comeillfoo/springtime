@@ -25,11 +25,25 @@ public class User extends UserBaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Dot> dotList;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "id"))
-    private List<Role> roles;
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(value = EnumType.STRING)
+    private List<Role> role;
+
+//
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(name = "user_role",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "id"))
+//    private List<Role> roles;
+
+//    public void addRole(Role role) {
+//        if (roles == null) {
+//            roles = new ArrayList<>();
+//        }
+//        Role newRole = new Role(role);
+//        roles.add(newRole);
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
