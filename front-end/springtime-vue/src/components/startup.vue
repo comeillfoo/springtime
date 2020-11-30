@@ -1,7 +1,7 @@
 <template>
   <div id="startup">
     <hat />
-    <loging v-bind:authorized="authorized" v-bind:token="token" />
+    <loging @update:token="update" />
   </div>
 </template>
 
@@ -11,10 +11,14 @@
 
   export default {
     name: 'startup',
-  	props: ['authorized', 'token',],
   	components: {
   		hat,
       loging,
   	},
+    methods: {
+      update: function(value) {
+        this.$emit('update:token', value);
+      }
+    }
   }
 </script>

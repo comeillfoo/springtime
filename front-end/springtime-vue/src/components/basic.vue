@@ -5,27 +5,27 @@
 
       <form id="result">
 
-        <fieldset title="Значение параметра x должно быть целым числом в пределах -4 до 4">
+        <fieldset ref="x" title="Значение параметра x должно быть целым числом в пределах -4 до 4">
           <label>x</label>
           <select v-model="result.x" required="true">
             <option v-for="value in xValues" >{{ value }}</option>
           </select>
         </fieldset>
 
-        <fieldset title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
+        <fieldset ref="y" title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
           <label>y</label>
-          <input type="text" placeholder="y&in;(-5, 5)" v-model="result.y" required="true" />
+          <input type="text" placeholder="y(-5, 5)" v-model="result.y" required="true" />
         </fieldset>
 
-        <fieldset title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
+        <fieldset ref="r" title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
           <label>r</label>
           <select v-model="result.r" required="true">
-            <option v-for="value in rValues" @change="redraw(value, $event);">{{ value }}</option>
+            <option v-for="value in xValues">{{ value }}</option>
           </select>
         </fieldset>
 
         <fieldset>
-          <button @click="check">проверить</button>
+          <button @click.prevent="check">проверить</button>
         </fieldset>
 
       </form>
@@ -38,7 +38,9 @@
       </canvas>
     </div>
 
-    <resultscontainer v-bind:token="token" />
+    <loader v-if="loading" />
+    <resultscontainer v-bind:results="results" v-else-if="results.length" />
+    <p v-else>результаты отсутствуют</p>
 
     <div id="close-container">
       <button @click="signout">закрыть сессию</button>
@@ -48,14 +50,16 @@
 
 <script>
   import resultscontainer from '@/components/temp_base/results_container'
+  import loader from '@/components/temp_base/loader'
 
   const baseValues = ['1', '2', '3', '4'];
 
   export default {
     name: 'basic',
-    props: ['authorized', 'token',],
+    props: ['token', ],
     components: {
       resultscontainer,
+      loader,
     },
 
     data: function() {
@@ -65,22 +69,114 @@
         yMinimal: '-5',
         yMaximum: '5',
         result: { x: '', y: '', r: '', },
+        results: [],
+        isLoading: true
       };
     },
-
     methods: {
-      redraw: function(radius, event) {
+      basedraw: function() {
+
+      },
+      redraw: function(radius) {
 
       },
 
-      check: function(event) {
+      testX: function(value) {
+        console.log(`x values: ${this.xValues}`);
+        return this.xValues.includes(value);
+      },
 
+      testY: function(value) {
+        const floatRegex = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/;
+        let float = parseFloat(value);
+        console.log(`parsed value: ${float}`);
+        const isFloat = floatRegex.test(value);
+        console.log(`float?: ${isFloat}`);
+        console.log(`not NaN?: ${!isNaN(float)}`);
+        const isLess = (float <= this.yMaximum - Number.EPSILON);
+        console.log(`less?: ${isLess}`);
+        const isMore = (float >= this.yMinimal + Number.EPSILON);
+        console.log(`more?: ${isMore}`);
+        return isFloat && !isNaN(float) && isLess && isMore;
+      },
+
+      testR: function(value) {
+        console.log(`r values: ${this.rValues}`);
+        return this.rValues.includes(value);
+      },
+
+      check: async function(event) {
+        let errorMsg = '';
+        console.log('--- x testing ---');
+        if (!this.testX(this.result.x))
+          errorMsg += this.$refs.x.title + ';\n';
+        console.log('--- y testing ---');
+        if (!this.testY(this.result.y))
+          errorMsg += this.$refs.y.title + ';\n';
+        console.log('--- r testing ---');
+        if (!this.testR(this.result.r))
+          errorMsg += this.$refs.r.title + ';\n';
+
+        console.log('=== total testing ===');
+        if (errorMsg.length) {
+          console.log(`Errors[${errorMsg.length}]: ${errorMsg}`);
+          alert(errorMsg);
+        } else {
+          console.log('provided valid data');
+          console.log(`sending ${this.result}`);
+          console.log('sending data...');
+
+          let response = await fetch("/create", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json;charset=utf-8',
+              'x-mock-response-code': '201'
+            },
+            body: JSON.stringify(this.result)
+          });
+
+          console.log('request sent checking if response is ok (201)');
+          if (response.status === 201)
+            console.log('response is ok (201)');
+          else
+            console.log('bad response');
+          console.log(`response status: ${response.status}`);
+        }
       },
 
       signout: function(event) {
-        this.authorized = false;
-        this.token = '';
+        console.log('close current session...');
+        this.$emit('update:token', '');
+      },
+
+      retrieve: async function(token) {
+        console.log('getting results with unique token');
+
+        let response = await fetch("/retrieve", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+            'x-mock-response-code': '200'
+          },
+          body: JSON.stringify(token)
+        });
+
+        console.log('check if response is ok');
+        if (response.ok) {
+          console.log('response is ok');
+          console.log('getting the json object');
+          let json = response.json();
+          this.results = json;
+        } else {
+          console.log('bad response');
+          console.log(`response status: ${response.status}`);
+          this.results = [];
+        }
+        this.isLoading = false;
       },
     },
+    mounted() {
+      retrieve(this.token);
+    }
   }
 </script>
