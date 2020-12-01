@@ -11,9 +11,9 @@
         <input type="password" placeholder="пароль" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
       </fieldset>
 
-      <fieldset>
-        <button @click="signin" title="Кнопка для входа в существующий аккаунт">Войти</button>
-        <button @click="signup" title="Кнопка для создания нового аккаунта">Зарегистрироваться</button>
+      <fieldset class="separated">
+        <button @click="signin" title="Кнопка для входа в существующий аккаунт" class="btn">Войти</button>
+        <button @click="signup" title="Кнопка для создания нового аккаунта" class="btn">Зарегистрироваться</button>
       </fieldset>
     </form>
   </div>
@@ -41,7 +41,6 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
-            'x-mock-response-code': '200'
           },
           body: JSON.stringify(this.user)
         });
@@ -96,3 +95,61 @@
   }
 
 </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+  #loging {
+    display: block;
+    width: 45%;
+    margin: 0 auto;
+  }
+
+  #login-form input {
+    border: 1px solid #c6c9cc;
+    border-radius: 5px;
+    color: #555;
+    display: block;
+    margin: 1% 0 4% 0;
+    padding: 1% 2%;
+  }
+
+  #login-form label {
+    color: #3e606f;
+    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+    text-transform: capitalize;
+  }
+
+  #login-form fieldset {
+    border: 1px solid #c6c9cc;
+    border-radius: 5px;
+    margin: 2% 0;
+  }
+
+  .btn {
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    letter-spacing: .5px;
+    margin: 2% 2%;
+    padding: 2% 5%;
+    background-color: #3e606f;
+    color: #eaeaea;
+  }
+
+  .btn:hover {
+    background-color: #5e808f;
+  }
+
+  .separated {
+    text-align: center;
+  }
+
+  @media only all and (max-width: 642px) {
+    #loging {
+      display: block;
+      width: 90%;
+    }
+  }
+</style>

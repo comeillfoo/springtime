@@ -37,12 +37,40 @@
 </script>
 
 <style>
+  *, *:before, *:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; 
+  }
+
   #wrap {
     font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
+    color: #efefef;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  @media only all and (min-width: 1245px) {
+    #wrap {
+      width: 1245px;
+      font-size: 16px;
+    }
+
+  }
+
+  @media only all and (min-width: 643px) and (max-width: 1244px) {
+    #wrap {
+      width: 643px;
+      font-size: 12px;
+    }
+  }
+
+  @media only all and (max-width: 642px) {
+    #wrap {
+      width: 320px;
+      font-size: 8px;
+    }
   }
 </style>

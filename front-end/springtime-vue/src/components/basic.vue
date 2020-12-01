@@ -2,9 +2,8 @@
   <div id="basic">
 
     <div id="form-container">
-
+      <h4 class="text__title">Форма</h4>
       <form id="result">
-
         <fieldset ref="x" title="Значение параметра x должно быть целым числом в пределах -4 до 4">
           <label>x</label>
           <select v-model="result.x" required="true">
@@ -14,7 +13,7 @@
 
         <fieldset ref="y" title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
           <label>y</label>
-          <input type="text" placeholder="y(-5, 5)" v-model="result.y" required="true" />
+          <input type="text" placeholder="y in (-5, 5)" v-model="result.y" required="true" />
         </fieldset>
 
         <fieldset ref="r" title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
@@ -24,8 +23,8 @@
           </select>
         </fieldset>
 
-        <fieldset>
-          <button @click.prevent="check">проверить</button>
+        <fieldset class="separated">
+          <button @click.prevent="check" class="btn">проверить</button>
         </fieldset>
 
       </form>
@@ -33,17 +32,17 @@
     </div>
 
     <div id="area-container">
-      <canvas id="area" width="500" height="500" @click="">
+      <canvas id="area" ref="area" width="500" height="500" @click="">
         Canvas not supported
       </canvas>
     </div>
 
-    <loader v-if="loading" />
+    <loader v-if="isLoading" />
     <resultscontainer v-bind:results="results" v-else-if="results.length" />
-    <p v-else>результаты отсутствуют</p>
+    <p class="empty-results" v-else>результаты отсутствуют</p>
 
     <div id="close-container">
-      <button @click="signout">закрыть сессию</button>
+      <button @click="signout" class="btn">закрыть сессию</button>
     </div>
   </div>
 </template>
@@ -156,7 +155,6 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
-            'x-mock-response-code': '200'
           },
           body: JSON.stringify(token)
         });
@@ -170,13 +168,169 @@
         } else {
           console.log('bad response');
           console.log(`response status: ${response.status}`);
-          this.results = [];
+          this.results = [
+            {
+              date: new Date(),
+              time: '0',
+              x: '4',
+              y: '4',
+              r: '4',
+              hit: true
+            },
+            {
+              date: new Date(),
+              time: '0',
+              x: '4',
+              y: '4.99999',
+              r: '4',
+              hit: true
+            },
+            {
+              date: new Date(),
+              time: '0',
+              x: '4',
+              y: '4',
+              r: '4',
+              hit: true
+            }
+          ];
         }
         this.isLoading = false;
       },
     },
     mounted() {
-      retrieve(this.token);
+      this.retrieve(this.token);
     }
   }
 </script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+  #basic {
+    width: 100%;
+    margin: 0;
+  }
+
+  #area {
+    width: 1245px;
+  }
+
+  .btn {
+    border: 0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    letter-spacing: .5px;
+    margin: 2% 2%;
+    padding: 11px 30px;
+    background-color: #3e606f;
+    color: #eaeaea;
+    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+    text-transform: capitalize;
+    font-size: 18px;
+  }
+
+  .btn:hover {
+    background-color: #5e808f;
+  }
+
+  #form-container {
+    display: block;
+    width: 45%;
+    margin: 0 auto;
+  }
+
+  #result input, select {
+    border: 1px solid #c6c9cc;
+    border-radius: 5px;
+    color: #555;
+    display: block;
+    margin: 1% 0 4% 0;
+    padding: 1% 2%;
+  }
+
+  .separated {
+    text-align: center;
+  }
+
+
+  #close-container {
+    text-align: center;
+  }
+
+  #result label {
+    color: #3e606f;
+    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+    text-transform: capitalize;
+  }
+
+  #result fieldset {
+    border: 1px solid #c6c9cc;
+    border-radius: 5px;
+    margin: 2% 0;
+  }
+
+  .text__title {
+    font-size: 24px;
+    line-height: 44px;
+    color: #3e606f;
+    margin: 0;
+    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+  }
+
+  .text__title {
+      font-size: 16px;
+      line-height: 22px;
+    }
+
+    #area {
+      width: 320px;
+    }
+
+    .btn {
+      font-size: 12px;
+    }
+
+    .empty-results {
+      text-align: center;
+      font-size: 24px;
+      line-height: 44px;
+      color: #3e606f;
+      margin: 0;
+      font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+    }
+
+  @media only all and (min-width: 643px) and (max-width: 1244px) {
+
+    .text__title {
+      font-size: 18px;
+      line-height: 32px;
+    }
+
+    #area {
+      width: 643px;
+    }
+
+    .btn {
+      font-size: 14px;
+    }
+
+    .empty-results {
+      font-size: 18px;
+      line-height: 32px;
+    }
+  }
+
+  @media only all and (max-width: 642px) {
+    #result {
+      display: block;
+      margin: 0 auto;
+    }
+
+    .empty-results {
+      font-size: 12;
+      line-height: 22px;
+    }
+  }
+</style>

@@ -1,14 +1,13 @@
 <template>
 	<div id="hat">
-    <h2>Авторы</h2>
-		<div v-for="a in authors">
+		<template v-for="a in authors">
 			<author v-bind:name="a.name"
 				v-bind:surname="a.surname"
 				v-bind:group="a.group"
 				v-bind:variant="a.variant"
 				v-bind:imageURL="a.imageURL"
 				v-bind:profileLink="a.profileLink" />
-		</div>
+		</template>
 	</div>
 </template>
 
@@ -46,3 +45,10 @@
 		},
 	}
 </script>
+
+<style>
+	#hat {
+    width: 100%;
+    margin: 4% auto;
+  }
+</style>

@@ -1,12 +1,19 @@
 <template>
-	<div class="lds-facebook">
-		<div></div>
-		<div></div>
-		<div></div>
-	</div>
+  <div id="loader">
+	 <div class="lds-facebook">
+		  <div></div>
+		  <div></div>
+		  <div></div>
+	 </div>
+  </div>
 </template>
 
 <style>
+#loader {
+  display: block;
+  text-align: center;
+}
+
 .lds-facebook {
   display: inline-block;
   position: relative;
@@ -18,7 +25,7 @@
   position: absolute;
   left: 8px;
   width: 16px;
-  background: #fcf;
+  background-color: #3e606f;
   animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
 }
 .lds-facebook div:nth-child(1) {
