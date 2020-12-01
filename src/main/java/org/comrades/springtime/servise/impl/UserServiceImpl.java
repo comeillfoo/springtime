@@ -2,11 +2,15 @@ package org.comrades.springtime.servise.impl;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
 import org.comrades.springtime.dao.UserRepository;
-import org.comrades.springtime.module.Role;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,44 +22,80 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User findUserByToken(String token) throws UserNotFoundException {
-        User user = userRepository.findUserByToken(token);
-        if (user == null) {
-            throw new UserNotFoundException("User not found by token: " + token);
-        }
-        return user;
-    }
+    public User findByUsername(String login) throws UserNotFoundException {
+        User user;
 
-    @Override
-    public User findUserByLogin(String login) throws UserNotFoundException {
-        return userRepository.findUserByLogin(login);
-    }
-
-//    @Override
-//    public List<User> findUserByRole(Role role) {
-//        return userRepository.findUserByRole(role);
-//    }
-
-    @Override
-    public User createUser(String login, String password, Role role, String token) {
-        User user = null;
         try {
-            user = userRepository.findUserByLogin(login);
-        }catch (UserNotFoundException ex) {/*NOPE*/}
+            user = userRepository.findUserByName(login);
+        }catch (UserNotFoundException ex) {
+            //TODO: log UserNotFoundException
+            throw new UserNotFoundException(ex.getMessage());
+        }
+        return user;
+    }
 
-        if (user == null) {
-            user.setLogin(login);
-            user.setPassword(password);
-            user.setToken(token);
-//            user.addRole(role);
-            saveUser(user);
+    @Override
+    public User findByUserId(Long id) throws UserNotFoundException {
+        User user;
+
+        try {
+            user = userRepository.findUserByUID(id);
+        }catch (UserNotFoundException ex) {
+            //TODO: log UserNotFoundException
+            throw new UserNotFoundException(ex.getMessage());
         }
 
         return user;
     }
 
     @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
+    public User findByRefreshToken(String refreshToken) throws UserNotFoundException {
+        User user;
+
+        try {
+            user = userRepository.findUserByRefreshToken(refreshToken);
+        }catch (UserNotFoundException ex) {
+            //TODO: log UserNotFoundException
+            throw new UserNotFoundException(ex.getMessage());
+        }
+
+        return user;
+    }
+
+    @Override
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userName = authentication.getName();
+
+        User user = null;
+
+        try {
+            user =userRepository.findUserByName(userName);
+        }catch (UserNotFoundException ex) { /*NOPE*/}
+
+        return user;
+    }
+
+    @Override
+    public void delete(Long id) throws UserNotFoundException {
+        User user;
+        try {
+             user = findByUserId(id);
+        }catch (UserNotFoundException ex) {
+            //TODO: log UserNotFoundException
+            throw new UserNotFoundException(ex.getMessage());
+        }
+
+        userRepository.delete(user);
     }
 }

@@ -15,9 +15,9 @@ public abstract class DotBaseEntity {
     @Column(name = "x_value")
     private Integer x;
     @Column(name = "y_value")
-    private Integer y;
+    private Double y;
     @Column(name = "r_value")
     private Integer r;
-    @Column(name = "is_hit")
-    private boolean isHit;
+    @Column(name = "is_hit", columnDefinition = "NUMBER(1)")
+    private Boolean isHit;
 }
