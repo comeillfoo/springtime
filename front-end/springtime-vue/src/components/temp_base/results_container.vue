@@ -14,7 +14,7 @@
 
       <tbody class="table__body">
         <tr v-for="result in results">
-          <td><div class="scrollable">{{ result.date.toLocaleString('ru', options) }}</div></td>
+          <td><div class="scrollable">{{ result.date.toUTCString() }}</div></td>
           <td><div class="scrollable">{{ result.time }}</div></td>
           <td><div class="scrollable">{{ result.x }}</div></td>
           <td><div class="scrollable special-width">{{ result.y }}</div></td>
@@ -31,19 +31,6 @@
 	export default {
     name: 'resultscontainer',
     props: ['results', ],
-    data: {
-    	options: {
-    		era: 'long',
-  			year: 'numeric',
-  			month: 'long',
-  			day: 'numeric',
-  			weekday: 'long',
-  			timezone: 'UTC',
-  			hour: 'numeric',
-  			minute: 'numeric',
-  			second: 'numeric'
-		  },
-    },
   }
 </script>
 

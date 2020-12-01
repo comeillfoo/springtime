@@ -1,14 +1,14 @@
 <template>
   <div id="loging">
-	  <form id="login-form">
+	  <form id="login-form" method="POST">
       <fieldset>
         <label>логин</label>
-        <input type="text" placeholder="имя пользователя" title="имя пользователя" v-model="user.login" required="true" autocomplete="username">
+        <input type="text" placeholder="dissya" title="имя пользователя" v-model="user.login" required="true" autocomplete="username">
       </fieldset>
 
       <fieldset>
         <label>пароль</label>
-        <input type="password" placeholder="пароль" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
+        <input type="password" placeholder="ZKB`gyv-x8Cuyv7N" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
       </fieldset>
 
       <fieldset class="separated">

@@ -1,47 +1,40 @@
 <template>
   <div id="basic">
+    <div id="container">
+      <div id="form-container">
+        <h4 class="text__title">Форма</h4>
+        <form id="result">
+          <fieldset ref="x" title="Значение параметра x должно быть целым числом в пределах -4 до 4">
+            <label>x</label>
+            <select v-model="result.x" required="true">
+              <option v-for="value in xValues" >{{ value }}</option>
+            </select>
+          </fieldset>
+          <fieldset ref="y" title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
+            <label>y</label>
+            <input type="text" placeholder="y in (-5, 5)" v-model="result.y" required="true" />
+          </fieldset>
+          <fieldset ref="r" title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
+            <label>r</label>
+            <select v-model="result.r" required="true">
+              <option v-for="value in xValues">{{ value }}</option>
+            </select>
+          </fieldset>
+          <fieldset class="separated">
+            <button @click.prevent="check" class="btn">проверить</button>
+          </fieldset>
+        </form>
 
-    <div id="form-container">
-      <h4 class="text__title">Форма</h4>
-      <form id="result">
-        <fieldset ref="x" title="Значение параметра x должно быть целым числом в пределах -4 до 4">
-          <label>x</label>
-          <select v-model="result.x" required="true">
-            <option v-for="value in xValues" >{{ value }}</option>
-          </select>
-        </fieldset>
-
-        <fieldset ref="y" title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
-          <label>y</label>
-          <input type="text" placeholder="y in (-5, 5)" v-model="result.y" required="true" />
-        </fieldset>
-
-        <fieldset ref="r" title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
-          <label>r</label>
-          <select v-model="result.r" required="true">
-            <option v-for="value in xValues">{{ value }}</option>
-          </select>
-        </fieldset>
-
-        <fieldset class="separated">
-          <button @click.prevent="check" class="btn">проверить</button>
-        </fieldset>
-
-      </form>
-
+      </div>
+      <div id="area-container">
+        <h4 class="text__title">Рабочая область</h4>
+        <canvas id="area" ref="area" width="643" height="643" @click="checkArea">
+          Canvas not supported
+        </canvas>
+      </div>
     </div>
-
-    <div id="area-container">
-      <canvas id="area" ref="area" width="500" height="500" @click="checkArea">
-        Canvas not supported
-      </canvas>
-    </div>
-
-    <loader v-if="isLoading" />
-    <resultscontainer v-bind:results="results" v-else-if="results.length" />
-    <p class="empty-results" v-else>результаты отсутствуют</p>
-
-    <div id="close-container">
+    <loader v-if="isLoading" /><resultscontainer v-bind:results="results" v-else-if="results.length" />
+    <p class="empty-results" v-else>результаты отсутствуют</p><div id="close-container">
       <button @click="signout" class="btn">закрыть сессию</button>
     </div>
   </div>
@@ -74,10 +67,18 @@
         isLoading: true
       };
     },
+    computed: {
+      radius: function() {
+        return this.result.r;
+      },
+    },
     watch: {
-      result.r: function(value) {
+      radius: function(value) {
         this.redraw(value);
       },
+      results: function(value) {
+        this.drawDots(value);
+      }
     },
     methods: {
       translateTo: function(realCoordinate, fieldSize, length, proportion) {
@@ -111,30 +112,32 @@
       },
 
       drawArea: function(canvas, ctx, x, y, radius) {
-        context.strokeStyle = '#3399FF';
-        context.fillStyle = '#3399FF';
+        ctx.strokeStyle = '#3399FF';
+        ctx.fillStyle = '#3399FF';
         console.log(`canvas: ${ canvas }, ctx: ${ ctx }, x: ${ x }, y: ${ y }, radius: ${ radius }`);
         console.log('drawing rectangle');
-        drawRectangle(ctx, x, y, radius);
+        this.drawRectangle(ctx, x, y, radius);
         console.log('drawing triangle');
-        drawTriangle(ctx, x, y, radius);
+        this.drawTriangle(ctx, x, y, radius);
         console.log('drawing quadrant');
-        drawQuadrant(ctx, x, y, radius);
+        this.drawQuadrant(ctx, x, y, radius);
       },
 
       drawVerticalLine: function(ctx, x, y, length) {
-        ctx.fillRect(x, y, 1, length);
+        ctx.fillRect(x, y, 2, length);
       },
 
       drawHorizontalLine: function(ctx, x, y, length) {
-        ctx.fillRect(x, y, length, 1);
+        ctx.fillRect(x, y, length, 2);
       },
 
       drawLines: function(ctx, x, y, length) {
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
         console.log('draw horizontal line');
-        drawHorizontalLine(ctx, 0, y, length);
+        this.drawHorizontalLine(ctx, 0, y, length);
         console.log('draw vertical line');
-        drawVerticalLine(ctx, x, 0, length);
+        this.drawVerticalLine(ctx, x, 0, length);
       },
       drawHorizontalArrow: function(ctx, x, y, length) {
         ctx.beginPath();
@@ -145,6 +148,12 @@
         ctx.fill();
         ctx.stroke();
       },
+
+      drawSignedHorizontalArrow: function(ctx, x, y, length, text) {
+        ctx.fillText(text, x - length, y - length);
+        this.drawHorizontalArrow(ctx, x, y, length);
+      },
+
       drawVerticalArrow: function(ctx, x, y, length) {
         ctx.beginPath();
         ctx.moveTo(x, y);
@@ -154,46 +163,133 @@
         ctx.fill();
         ctx.stroke();
       },
+
+      drawSignedVerticalArrow: function(ctx, x, y, length, text) {
+        ctx.fillText(text, x + length, y + length);
+        this.drawVerticalArrow(ctx, x, y, length);
+      },
+
       drawArrows: function(ctx, x, y, length) {
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
         console.log('drawing horizontal arrow');
-        drawHorizontalArrow(ctx, x, 0, length);
+        this.drawHorizontalArrow(ctx, x, 0, length);
         console.log('drawing vertical arrow');
-        drawVerticalArrow(ctx, 2 * x, y, length);
+        this.drawVerticalArrow(ctx, 2 * x, y, length);
       },
-      drawHorizontalNotch: function() {
+      drawSignedArrows: function(ctx, x, y, length) {
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
+        console.log('drawing signed horizontal arrow');
+        this.drawSignedHorizontalArrow(ctx, 2 * x, y, length, 'y');
+        console.log('drawing signed vertical arrow');
+        this.drawSignedVerticalArrow(ctx, x, 0, length, 'x');
+      },
 
+      drawSignedHorizontalNotch: function(ctx, x, y, length, text) {
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
+        ctx.fillText(text, x + length, y + length / 2);
+        this.drawHorizontalLine(ctx, x - length / 2, y, length);
       },
-      drawVerticalNotch: function() {
-
-      },
-      drawNotches: function(ctx, width, height, start, finish, step, length) {
-        for (pos = start; pos <= finish; pos += step) {
-          drawHorizontalNotch(ctx, pos, y, length);
-          drawVerticalNotch(ctx, x, y, length);
-        }
+      drawSignedVerticalNotch: function(ctx, x, y, length, text) {
+        ctx.strokeStyle = '#000000';
+        ctx.fillStyle = '#000000';
+        ctx.fillText(text, x - length, y - length);
+        this.drawVerticalLine(ctx, x, y - length / 2, length);
       },
       tempdraw: function(title) {
+        console.log('drawing template');
         let canvas = this.$refs.area;
         let ctx = canvas.getContext('2d');
         let width = canvas.width;
         let height = canvas.height;
         let radius = width * part;
+        console.log(`canvas: (${width}:${height})`);
+
+        const fontName = 'sans-serif';
+        const textSize = width / 38;
+        ctx.font = `${textSize}px ${fontName}`;
+
+        console.log('clearing canvas');
+        ctx.clearRect(0, 0, width, height);
+
         console.log('drawing working area');
-        drawArea(canvas, ctx, width / 2, height / 2, radius);
+        this.drawArea(canvas, ctx, width / 2, height / 2, radius);
+
         console.log('drawing coordinate lines');
-        drawLines(ctx, width / 2, height / 2, width);
+        this.drawLines(ctx, width / 2, height / 2, width);
+
         console.log('drawing direction arrows');
-        drawArrows(ctx, width / 2, height / 2, radius / 100);
+        this.drawSignedArrows(ctx, width / 2, height / 2, radius / 20);
+
         console.log('drawing notches');
-        drawNotches();
-      },
-      basedraw: function(title) {
+
+        console.log('drawing horizontal notches');
+        this.drawSignedHorizontalNotch(ctx, width / 2, height / 2 + radius, radius / 20, '-R');
+        this.drawSignedHorizontalNotch(ctx, width / 2, height / 2 + radius / 2, radius / 20, '-R/2');
+        this.drawSignedHorizontalNotch(ctx, width / 2, height / 2 - radius / 2, radius / 20, 'R/2');
+        this.drawSignedHorizontalNotch(ctx, width / 2, height / 2 - radius, radius / 20, 'R');
+
+        console.log('drawing vertical notches');
+        this.drawSignedVerticalNotch(ctx, width / 2 - radius, height / 2, radius / 20, '-R');
+        this.drawSignedVerticalNotch(ctx, width / 2 - radius / 2, height / 2, radius / 20, '-R/2');
+        this.drawSignedVerticalNotch(ctx, width / 2 + radius / 2, height / 2, radius / 20, 'R/2');
+        this.drawSignedVerticalNotch(ctx, width / 2 + radius, height / 2, radius / 20, 'R');
+
+        console.log('template drew');
 
       },
+      basedraw: function(title) {
+        console.log('drawing with real radius');
+        let canvas = this.$refs.area;
+        let ctx = canvas.getContext('2d');
+        let width = canvas.width;
+        let height = canvas.height;
+        let radius = width * part;
+
+        console.log(`canvas: (${width}:${height})`);
+
+        const fontName = 'sans-serif';
+        const textSize = width / 38;
+        ctx.font = `${textSize}px ${fontName}`;
+
+        console.log('clearing canvas');
+        ctx.clearRect(0, 0, width, height);
+
+        console.log('drawing working area');
+        this.drawArea(canvas, ctx, width / 2, height / 2, title * radius / maxRadius);
+
+        console.log('drawing coordinate lines');
+        this.drawLines(ctx, width / 2, height / 2, width);
+
+        console.log('drawing direction arrows');
+        this.drawSignedArrows(ctx, width / 2, height / 2, radius / 20);
+
+        console.log('drawing notches');
+
+        console.log('drawing horizontal notches');
+        for (let i = -4; i <= 4; i += 0.5) {
+          let start = height / 2 + radius;
+          let step = 2 * radius / 8;
+          if (i === 0)
+            continue;
+          this.drawSignedHorizontalNotch(ctx, width / 2, start - (maxRadius + i) * step, radius / 20, i + '');
+        }
+
+        console.log('drawing vertical notches');
+        for (let i = -4; i <= 4; i += 0.5) {
+          let start = width / 2 - radius;
+          let step = 2 * radius / 8;
+          this.drawSignedVerticalNotch(ctx, start + (maxRadius + i) * step, height / 2, radius / 20, i + '');
+        }
+
+        console.log('basic drew');
+      },
       redraw: function(radius) {
-        if (!radius)
-          tempdraw('R');
-        else basedraw(radius);
+        if (!radius || radius <= 0)
+          this.tempdraw('R');
+        else this.basedraw(radius);
       },
 
       testX: function(value) {
@@ -280,6 +376,36 @@
         console.log(`response status: ${response.status}`);
       },
 
+      drawDots: function(results) {
+        console.log(`${ results }`);
+        if (!results.length)
+          console.log('no any results in the table');
+        else {
+          this.result.r = results[0].r;
+          const out = 5;
+          let canvas = this.$refs.area;
+          let ctx = canvas.getContext('2d');
+          let width = canvas.width;
+          let height = canvas.height;
+          for (let i = 0; i < results.length; ++i) {
+            console.log(`putting dot: ${results[i]}`);
+            console.log(`x: ${ results[i].x }; y: ${ results[i].y }`);
+            ctx.fillSyle = results[i].hit? "#000000" : "#cd0000";
+            console.log('translating coordinates');
+            const realX = this.translateFrom(results[i].x, width, maxRadius, part);
+            const realY = this.translateFrom(-results[i].y, height, maxRadius,part);
+            console.log(`translated: x: ${ realX } y: ${ realY }`);
+
+            console.log('putting dots');
+            ctx.beginPath();
+            ctx.arc(realX, realY, maxRadius, 0, 2*Math.PI, true);
+            ctx.fill();
+            ctx.stroke();
+            ctx.closePath();
+          }
+        }
+      },
+
       check: async function(event) {
         let errorMsg = '';
         console.log('--- x testing ---');
@@ -309,7 +435,7 @@
           console.log('radius not set');
           alert('Не установлено свойство радиуса области');
         }
-        else if (!testR(this.result.r)) {
+        else if (!this.testR(this.result.r)) {
           console.log('invalid radius value');
           alert(this.$refs.r.title);
         }
@@ -317,6 +443,7 @@
           console.log('valid radius value');
           let area = this.$refs.area;
           const rect = area.getBoundingClientRect();
+          console.log(`canvas: (${area.width}:${area.height})`);
 
           console.log('getting x coordinate');
           const realX = event.clientX - rect.left;
@@ -339,7 +466,7 @@
           console.log('fetching new result');
           this.fetchResult();
         }
-      }
+      },
 
       signout: function(event) {
         console.log('close current session...');
@@ -371,13 +498,14 @@
         } else {
           console.log('bad response');
           console.log(`response status: ${response.status}`);
-          this.results = [];
+          this.results = [ { date: new Date(), time: 0, x: 4, y: 4, r: 4, hit: true }];
         }
         this.isLoading = false;
       },
     },
     mounted() {
       this.retrieve();
+      this.redraw(this.radius);
     }
   }
 </script>
@@ -388,10 +516,29 @@
   #basic {
     width: 100%;
     margin: 0;
+    padding: 0;
   }
 
   #area {
-    width: 1245px;
+    width: 90%;
+    height: auto;
+  }
+
+  #container {
+    display: block;
+  }
+
+  #area-container {
+    display: block;
+    width: 45%;
+    margin: 2% auto;
+    text-align: center;
+  }
+
+  #form-container {
+    display: block;
+    width: 45%;
+    margin: 2% auto;
   }
 
   .btn {
@@ -406,17 +553,19 @@
     color: #eaeaea;
     font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
     text-transform: capitalize;
-    font-size: 18px;
+    font-size: 12px;
   }
 
   .btn:hover {
     background-color: #5e808f;
   }
 
+  #area-container {
+    border: 1px solid #c6c9cc;
+    border-radius: 5px;
+  }
+
   #form-container {
-    display: block;
-    width: 45%;
-    margin: 0 auto;
   }
 
   #result input, select {
@@ -450,6 +599,15 @@
   }
 
   .text__title {
+    font-size: 16px;
+    line-height: 44px;
+    color: #3e606f;
+    margin: 0;
+    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+  }
+
+  .empty-results {
+    text-align: center;
     font-size: 24px;
     line-height: 44px;
     color: #3e606f;
@@ -457,37 +615,14 @@
     font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
   }
 
-  .text__title {
-      font-size: 16px;
-      line-height: 22px;
-    }
-
-    #area {
-      width: 320px;
-    }
-
-    .btn {
-      font-size: 12px;
-    }
-
-    .empty-results {
-      text-align: center;
-      font-size: 24px;
-      line-height: 44px;
-      color: #3e606f;
-      margin: 0;
-      font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
-    }
+  @media only all and (min-width: 1245px) {
+  }
 
   @media only all and (min-width: 643px) and (max-width: 1244px) {
 
     .text__title {
       font-size: 18px;
       line-height: 32px;
-    }
-
-    #area {
-      width: 643px;
     }
 
     .btn {
