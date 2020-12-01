@@ -1,6 +1,6 @@
 <template>
   <div id="loging">
-	  <form id="login-form" method="POST">
+      <div id="login-form">
       <fieldset>
         <label>логин</label>
         <input type="text" placeholder="dissya" title="имя пользователя" v-model="user.login" required="true" autocomplete="username">
@@ -8,14 +8,14 @@
 
       <fieldset>
         <label>пароль</label>
-        <input type="password" placeholder="ZKB`gyv-x8Cuyv7N" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
+        <input type="password" placeholder="qwerty" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
       </fieldset>
 
       <fieldset class="separated">
         <button @click="signin" title="Кнопка для входа в существующий аккаунт" class="btn">Войти</button>
         <button @click="signup" title="Кнопка для создания нового аккаунта" class="btn">Зарегистрироваться</button>
       </fieldset>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -158,3 +158,5 @@
     }
   }
 </style>
+
+//TODO: расположение формы ввода слева а графика справа

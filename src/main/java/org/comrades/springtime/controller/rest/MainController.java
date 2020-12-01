@@ -1,4 +1,4 @@
-package org.comrades.springtime.controller;
+package org.comrades.springtime.controller.rest;
 
 
 import org.comrades.springtime.module.Dot;

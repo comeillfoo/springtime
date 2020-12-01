@@ -11,6 +11,6 @@ public class RedirectController {
     @GetMapping
     public String forwardLogin() {
 //        return "suck";
-        return "forward:/index.html";
+        return "/index.html";
     }
 }

@@ -3,7 +3,6 @@ package org.comrades.springtime.config;
 import org.comrades.springtime.security.jwt.TokenHandler;
 import org.comrades.springtime.security.jwt.filters.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,7 +11,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -21,14 +19,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final String LOGIN_ENDPOINT = "/api/aunt/**";
     private final String REFRESH_ENDPOINT = "/api/refresh/**";
+    private final String CONTENT = "/dist/**";
 
     private final TokenHandler jwtTokenHandler;
 
-    private UserDetailsService userDetailsService;
-
     @Autowired
-    public WebSecurityConfig(@Qualifier("jwtUserDetailsService") UserDetailsService userDetailsService, TokenHandler jwtTokenHandler) {
-        this.userDetailsService = userDetailsService;
+    public WebSecurityConfig(TokenHandler jwtTokenHandler) {
         this.jwtTokenHandler = jwtTokenHandler;
     }
 
@@ -42,11 +38,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/").permitAll()
                     .antMatchers(LOGIN_ENDPOINT).permitAll()
                     .antMatchers(REFRESH_ENDPOINT).permitAll()
+                    .antMatchers(CONTENT).permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .addFilterBefore(new JwtFilter(jwtTokenHandler), UsernamePasswordAuthenticationFilter.class);
-//                .and()
-
     }
 
     @Override

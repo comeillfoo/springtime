@@ -1,13 +1,11 @@
-package org.comrades.springtime.controller;
+package org.comrades.springtime.controller.rest;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
 import org.comrades.springtime.module.User;
-import org.comrades.springtime.module.requested.AuthenticationRequestDto;
 import org.comrades.springtime.module.requested.RefreshTokenDto;
 import org.comrades.springtime.security.jwt.TokenHandler;
 import org.comrades.springtime.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
