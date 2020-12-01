@@ -32,7 +32,7 @@
     </div>
 
     <div id="area-container">
-      <canvas id="area" ref="area" width="500" height="500" @click="">
+      <canvas id="area" ref="area" width="500" height="500" @click="checkArea">
         Canvas not supported
       </canvas>
     </div>
@@ -52,10 +52,12 @@
   import loader from '@/components/temp_base/loader'
 
   const baseValues = ['1', '2', '3', '4'];
+  const maxRadius = Math.max(...baseValues);
+  const part = 0.45;
 
   export default {
     name: 'basic',
-    props: ['token', ],
+    props: ['accessToken', 'refreshToken', ],
     components: {
       resultscontainer,
       loader,
@@ -72,12 +74,126 @@
         isLoading: true
       };
     },
+    watch: {
+      result.r: function(value) {
+        this.redraw(value);
+      },
+    },
     methods: {
-      basedraw: function() {
+      translateTo: function(realCoordinate, fieldSize, length, proportion) {
+        return length * (realCoordinate - fieldSize / 2) / (fieldSize * proportion);
+      },
+      translateFrom: function(imagCoordinate, fieldSize, length, proportion) {
+        return fieldSize * (imagCoordinate * proportion / length + 0.5);
+      },
+
+      drawRectangle(ctx, x, y, radius) {
+        ctx.fillRect(x - radius, y, radius, radius / 2);
+      },
+
+      drawTriangle(ctx, x, y, radius) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y - radius);
+        ctx.lineTo(x + radius / 2, y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+      },
+
+      drawQuadrant(ctx, x, y, radius) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius / 2, 0, Math.PI / 2, false);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+      },
+
+      drawArea: function(canvas, ctx, x, y, radius) {
+        context.strokeStyle = '#3399FF';
+        context.fillStyle = '#3399FF';
+        console.log(`canvas: ${ canvas }, ctx: ${ ctx }, x: ${ x }, y: ${ y }, radius: ${ radius }`);
+        console.log('drawing rectangle');
+        drawRectangle(ctx, x, y, radius);
+        console.log('drawing triangle');
+        drawTriangle(ctx, x, y, radius);
+        console.log('drawing quadrant');
+        drawQuadrant(ctx, x, y, radius);
+      },
+
+      drawVerticalLine: function(ctx, x, y, length) {
+        ctx.fillRect(x, y, 1, length);
+      },
+
+      drawHorizontalLine: function(ctx, x, y, length) {
+        ctx.fillRect(x, y, length, 1);
+      },
+
+      drawLines: function(ctx, x, y, length) {
+        console.log('draw horizontal line');
+        drawHorizontalLine(ctx, 0, y, length);
+        console.log('draw vertical line');
+        drawVerticalLine(ctx, x, 0, length);
+      },
+      drawHorizontalArrow: function(ctx, x, y, length) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - length, y - length / 2);
+        ctx.lineTo(x - length, y + length / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      },
+      drawVerticalArrow: function(ctx, x, y, length) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - length / 2, y + length);
+        ctx.lineTo(x + length / 2, y + length);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      },
+      drawArrows: function(ctx, x, y, length) {
+        console.log('drawing horizontal arrow');
+        drawHorizontalArrow(ctx, x, 0, length);
+        console.log('drawing vertical arrow');
+        drawVerticalArrow(ctx, 2 * x, y, length);
+      },
+      drawHorizontalNotch: function() {
+
+      },
+      drawVerticalNotch: function() {
+
+      },
+      drawNotches: function(ctx, width, height, start, finish, step, length) {
+        for (pos = start; pos <= finish; pos += step) {
+          drawHorizontalNotch(ctx, pos, y, length);
+          drawVerticalNotch(ctx, x, y, length);
+        }
+      },
+      tempdraw: function(title) {
+        let canvas = this.$refs.area;
+        let ctx = canvas.getContext('2d');
+        let width = canvas.width;
+        let height = canvas.height;
+        let radius = width * part;
+        console.log('drawing working area');
+        drawArea(canvas, ctx, width / 2, height / 2, radius);
+        console.log('drawing coordinate lines');
+        drawLines(ctx, width / 2, height / 2, width);
+        console.log('drawing direction arrows');
+        drawArrows(ctx, width / 2, height / 2, radius / 100);
+        console.log('drawing notches');
+        drawNotches();
+      },
+      basedraw: function(title) {
 
       },
       redraw: function(radius) {
-
+        if (!radius)
+          tempdraw('R');
+        else basedraw(radius);
       },
 
       testX: function(value) {
@@ -104,6 +220,66 @@
         return this.rValues.includes(value);
       },
 
+      fetchToken: async function(repeat, ...args) {
+        console.log(`current access-token expired: ${this.accessToken}`);
+        console.log('fetching new one');
+
+        let response = await fetch("/api/refresh/token", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: JSON.stringify(this.refreshToken),
+        });
+
+        console.log('check if response is ok');
+        if (response.ok) {
+
+          console.log('successful fetching new tokens');
+          console.log('getting json object');
+          let json = response.json();
+          if (!json) {
+
+            console.log(`fetched from backend ${ json }`);
+            let refreshToken = json.refreshToken;
+            console.log(`get refresh token: ${ refreshToken }`);
+            let accessToken = json.accessToken;
+            console.log(`get access token: ${ accessToken }`);
+            this.$emit('update:refreshToken', refreshToken);
+            this.$emit('update:accessToken', accessToken);
+            repeat = repeat.bind(this);
+            repeat(args);
+
+          } else console.log('empty response body');
+
+        } else console.log('bad response');
+      },
+
+      fetchResult: async function() {
+        console.log('provided valid data');
+        console.log(`sending ${this.result}`);
+        console.log('sending data...');
+
+        let response = await fetch("/main/app/add", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8',
+            'shell_token': this.accessToken,
+          },
+          body: JSON.stringify(this.result)
+        });
+
+        console.log('request sent checking if response is ok (201)');
+        if (response.status === 201)
+          console.log('response is ok (201)');
+        else if (response.status === 403) {
+          console.log('access token expired');
+          this.fetchToken(this.fetchResult);
+        } else
+          console.log('bad response');
+        console.log(`response status: ${response.status}`);
+      },
+
       check: async function(event) {
         let errorMsg = '';
         console.log('--- x testing ---');
@@ -121,42 +297,66 @@
           console.log(`Errors[${errorMsg.length}]: ${errorMsg}`);
           alert(errorMsg);
         } else {
-          console.log('provided valid data');
-          console.log(`sending ${this.result}`);
-          console.log('sending data...');
-
-          let response = await fetch("/create", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json;charset=utf-8',
-              'x-mock-response-code': '201'
-            },
-            body: JSON.stringify(this.result)
-          });
-
-          console.log('request sent checking if response is ok (201)');
-          if (response.status === 201)
-            console.log('response is ok (201)');
-          else
-            console.log('bad response');
-          console.log(`response status: ${response.status}`);
+          console.log('fetching new result');
+          this.fetchResult();
         }
       },
 
+      checkArea: async function(event) {
+        console.log(`current radius: ${this.result.r }`);
+        console.log('check if radius set');
+        if (!this.result.r) {
+          console.log('radius not set');
+          alert('Не установлено свойство радиуса области');
+        }
+        else if (!testR(this.result.r)) {
+          console.log('invalid radius value');
+          alert(this.$refs.r.title);
+        }
+        else {
+          console.log('valid radius value');
+          let area = this.$refs.area;
+          const rect = area.getBoundingClientRect();
+
+          console.log('getting x coordinate');
+          const realX = event.clientX - rect.left;
+          console.log(`mouse x: ${ realX }`);
+
+          console.log('translating to x value');
+          const x = this.translateTo(realX, area.width, maxRadius, part);
+          console.log(`x translated to: ${ x }`);
+          this.result.x = x;
+
+          console.log('getting y coordinate');
+          const realY = event.clientY - rect.top;
+          console.log(`mouse y: ${ realY }`);
+
+          console.log('translating to y value');
+          const y = this.translateTo(realY, area.height, maxRadius, part);
+          console.log(`y translated to: ${ y }`);
+          this.result.y = y;
+
+          console.log('fetching new result');
+          this.fetchResult();
+        }
+      }
+
       signout: function(event) {
         console.log('close current session...');
-        this.$emit('update:token', '');
+        this.$emit('update:accessToken', '');
+        this.$emit('update:refreshToken', '')
       },
 
-      retrieve: async function(token) {
+      retrieve: async function() {
         console.log('getting results with unique token');
 
-        let response = await fetch("/retrieve", {
+        let response = await fetch("/main/app/dots/all", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
+            'shell_token': this.accessToken,
           },
-          body: JSON.stringify(token)
+          body: JSON.stringify(this.accessToken)
         });
 
         console.log('check if response is ok');
@@ -165,41 +365,19 @@
           console.log('getting the json object');
           let json = response.json();
           this.results = json;
+        } else if (response.status === 403) {
+          console.log('access token expired');
+          this.fetchToken(this.retrieve)
         } else {
           console.log('bad response');
           console.log(`response status: ${response.status}`);
-          this.results = [
-            {
-              date: new Date(),
-              time: '0',
-              x: '4',
-              y: '4',
-              r: '4',
-              hit: true
-            },
-            {
-              date: new Date(),
-              time: '0',
-              x: '4',
-              y: '4.99999',
-              r: '4',
-              hit: true
-            },
-            {
-              date: new Date(),
-              time: '0',
-              x: '4',
-              y: '4',
-              r: '4',
-              hit: true
-            }
-          ];
+          this.results = [];
         }
         this.isLoading = false;
       },
     },
     mounted() {
-      this.retrieve(this.token);
+      this.retrieve();
     }
   }
 </script>

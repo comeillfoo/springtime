@@ -17,7 +17,7 @@
           <td><div class="scrollable">{{ result.date.toLocaleString('ru', options) }}</div></td>
           <td><div class="scrollable">{{ result.time }}</div></td>
           <td><div class="scrollable">{{ result.x }}</div></td>
-          <td><div class="scrollable">{{ result.y }}</div></td>
+          <td><div class="scrollable special-width">{{ result.y }}</div></td>
           <td><div class="scrollable">{{ result.r }}</div></td>
           <td><div class="scrollable">{{ result.hit? 'yes' : 'no' }}</div></td>
         </tr>
@@ -103,4 +103,7 @@
     text-align: left;
   }
 
+  .special-width {
+    width: 128px;
+  }
 </style>
