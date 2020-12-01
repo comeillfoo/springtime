@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@RequestMapping(name = "/api/**")
+@RequestMapping("/api/refresh/**")
 public class RefreshTokenController {
 
     private final TokenHandler tokenHandler;
@@ -31,9 +31,10 @@ public class RefreshTokenController {
         this.userService = userService;
     }
 
-    @PostMapping(name = "/refresh")
+    @PostMapping("/token")
     public ResponseEntity refreshToken(@RequestBody RefreshTokenDto refreshTokenDto) {
         Map<Object, Object> response = new HashMap<>();
+
         try {
             String frontRefreshToken = refreshTokenDto.getRefreshToken();
 

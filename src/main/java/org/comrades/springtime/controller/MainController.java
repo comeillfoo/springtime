@@ -1,13 +1,11 @@
 package org.comrades.springtime.controller;
 
 
-import org.comrades.springtime.dao.DotRepository;
 import org.comrades.springtime.module.Dot;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.module.requested.DotDto;
 import org.comrades.springtime.servise.DotService;
 import org.comrades.springtime.servise.UserService;
-import org.comrades.springtime.servise.impl.DotServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +30,7 @@ public class MainController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity add(@RequestParam DotDto dotDto) {
+    public ResponseEntity add(@RequestBody DotDto dotDto) {
         Map<Object, Object> response = new HashMap<>();
 
         Dot dot = new Dot();
@@ -54,7 +52,10 @@ public class MainController {
         dotService.checkDots(dot);
         dotService.saveDot(dot);
 
+        dot.setUser(null);
+
         return ResponseEntity.ok(Collections.singleton(dot));
+//        return getEveryUserDot();
     }
 
     @PostMapping("/clear")
@@ -65,11 +66,14 @@ public class MainController {
         return ResponseEntity.ok("");
     }
 
-    @GetMapping("/dots/all")
-    public ResponseEntity getEveryDot() {
+    @PostMapping("/dots/all")
+    public ResponseEntity getEveryUserDot() {
         User user = userService.getCurrentUser();
         List<Dot> dotList = dotService.getDotsByUser(user);
 
+        for(Dot dot : dotList) {
+            dot.setUser(null);
+        }
         return ResponseEntity.ok(dotList);
     }
 }

@@ -6,15 +6,17 @@ import org.comrades.springtime.module.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -25,15 +27,22 @@ public class TokenHandler implements Tokenable {
     @Value("${token.expire_time}")
     private Long expireTime = null;
 
-    private SecretKey secretKeyClass = null;
+//    private SecretKey secretKeyClass = null;
+    private String secretKeyK = null;
     private UserDetailsService userDetailsService;
 
-    private SecretKey initAndGetSecretKey() {
-        if (secretKeyClass == null) {
-            secretKeyClass = new SecretKeySpec(this.secretKey.getBytes(), 0, this.secretKey.getBytes().length, SignatureAlgorithm.HS256.toString());
+    private String initAndGetSecretKey() {
+        if (secretKeyK == null) {
+            secretKeyK = Base64.getEncoder().encodeToString(secretKey.getBytes());
+            secretKey = secretKeyK;
         }
+//        if (secretKeyClass == null) {
+//            secretKeyClass = new SecretKeySpec(this.secretKey.getBytes(), 0, this.secretKey.getBytes().length, "AES");
+//        }
 
-        return secretKeyClass;
+
+
+        return secretKey;
     }
 
     @Autowired
@@ -41,15 +50,22 @@ public class TokenHandler implements Tokenable {
         this.userDetailsService = userDetailsService;
     }
 
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        return bCryptPasswordEncoder;
+    }
+
     @Override
     public String generateRefreshToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getName());
 
-        SecretKey secretKeyClass = initAndGetSecretKey();
+//        SecretKey secretKeyClass = initAndGetSecretKey();
 
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
-                .signWith(secretKeyClass)
+                .signWith(SignatureAlgorithm.HS256, initAndGetSecretKey())
+//                .signWith(secretKeyClass)
                 .compact();
 
         return refreshToken;
@@ -59,7 +75,7 @@ public class TokenHandler implements Tokenable {
     public String generateAccessToken(User user) {
         Claims claims = Jwts.claims().setSubject(user.getName());
 
-        SecretKey secretKeyClass = initAndGetSecretKey();
+//        SecretKey secretKeyClass = initAndGetSecretKey();
 
         Date dateNow = new Date();
         Date expireDate = new Date(dateNow.getTime() + expireTime);
@@ -68,7 +84,8 @@ public class TokenHandler implements Tokenable {
                 .setClaims(claims)
                 .setIssuedAt(dateNow)
                 .setExpiration(expireDate)
-                .signWith(secretKeyClass)
+                .signWith(SignatureAlgorithm.HS256, initAndGetSecretKey())
+//                .signWith(secretKeyClass)
                 .compact();
 
         return accessToken;
@@ -87,9 +104,9 @@ public class TokenHandler implements Tokenable {
     @Override
     public boolean validateToken(String token) {
         try {
-            SecretKey secretKeyClass = initAndGetSecretKey();
+//            SecretKey secretKeyClass = initAndGetSecretKey();
 
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKeyClass.toString()).parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(initAndGetSecretKey()).parseClaimsJws(token);
 
             return !claims.getBody().getExpiration().before(new Date());
         }catch (JwtException | IllegalArgumentException ex) {
@@ -106,7 +123,7 @@ public class TokenHandler implements Tokenable {
 
     @Override
     public String getUsername(String token) {
-        SecretKey secretKeyClass = initAndGetSecretKey();
+//        SecretKey secretKeyClass = initAndGetSecretKey();
         //TODO: check if it's work
 //        return Jwts.parserBuilder().setSigningKey(secretKeyClass.toString()).requireSubject(token).toString();
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();

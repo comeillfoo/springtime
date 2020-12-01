@@ -63,8 +63,12 @@ public class DotServiceImpl implements DotService {
     }
 
     @Override
-    public boolean clearByUser(User user) {
-        return dotRepository.clearByUser(user);
+    public void clearByUser(User user) {
+//        return dotRepository.deleteAllByUser(user);
+        for(Dot dot : user.getDotList()) {
+            dotRepository.delete(dot);
+//            dotRepository.removeByDotId(dot.getDotId());
+        }
     }
 
 

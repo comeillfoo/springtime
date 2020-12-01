@@ -14,7 +14,7 @@ public interface DotService {
 
     Dot validate(DotBaseEntity dot) throws NumberFormatException;
 
-    boolean clearByUser(User user);
+    void clearByUser(User user);
 
     Dot saveDot(Dot dot);
 }

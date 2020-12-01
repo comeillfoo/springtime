@@ -5,9 +5,9 @@ import org.comrades.springtime.dao.UserRepository;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +15,14 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) { this.userRepository = userRepository; }
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @Override
@@ -31,6 +35,7 @@ public class UserServiceImpl implements UserService {
             //TODO: log UserNotFoundException
             throw new UserNotFoundException(ex.getMessage());
         }
+        if (user == null) throw new UserNotFoundException("");
         return user;
     }
 
@@ -44,6 +49,8 @@ public class UserServiceImpl implements UserService {
             //TODO: log UserNotFoundException
             throw new UserNotFoundException(ex.getMessage());
         }
+
+        if (user == null) throw new UserNotFoundException("");
 
         return user;
     }
@@ -59,6 +66,8 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(ex.getMessage());
         }
 
+        if (user == null) throw new UserNotFoundException("");
+
         return user;
     }
 
@@ -69,6 +78,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
         return userRepository.save(user);
     }
 

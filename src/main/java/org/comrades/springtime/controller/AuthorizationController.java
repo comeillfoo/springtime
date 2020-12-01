@@ -1,6 +1,7 @@
 package org.comrades.springtime.controller;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
+import org.comrades.springtime.module.Role;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.module.requested.AuthenticationRequestDto;
 import org.comrades.springtime.security.jwt.TokenHandler;
@@ -24,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/aunt/**")
+@RequestMapping("/api/aunt/**")
 public class AuthorizationController {
 
     private final AuthenticationManager authenticationManager;
@@ -43,13 +44,20 @@ public class AuthorizationController {
         Map<Object, Object> response = new HashMap<>();
         try {
             String username = authenticationRequestDto.getUsername();
+            String password = authenticationRequestDto.getPassword();
+
+            if (username == null || password == null) {
+                throw new NonUniqueResultException("username or password should not be empty");
+            }
 
             try {
                 userService.findByUsername(username);
                 throw new NonUniqueResultException("Username is already in use.");
             }catch (UserNotFoundException ex) {}
 
-            User user = new User(username, authenticationRequestDto.getPassword());
+            User user = new User(username, password);
+            user.addRole(Role.ROLE_USER);
+
 
             String refreshToken = jwtTokenProvider.generateRefreshToken(user);
             user.setRefreshToken(refreshToken);
@@ -61,9 +69,8 @@ public class AuthorizationController {
             Authentication auth = jwtTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            response.put("username", username);
-            response.put("refresh_token", refreshToken);
-            response.put("token", accessToken);
+            response.put("refreshToken", refreshToken);
+            response.put("accessToken", accessToken);
 
             return ResponseEntity.ok(response);
         }catch (IncorrectResultSizeDataAccessException | NonUniqueResultException ex) {
@@ -85,9 +92,8 @@ public class AuthorizationController {
 
             String accessToken = jwtTokenProvider.generateAccessToken(user);
 
-            response.put("username", username);
-            response.put("refresh_token", user.getRefreshToken());
-            response.put("token", accessToken);
+            response.put("refreshToken", user.getRefreshToken());
+            response.put("accessToken", accessToken);
 
             return ResponseEntity.ok(response);
         }catch (UserNotFoundException | AuthenticationException ex) {

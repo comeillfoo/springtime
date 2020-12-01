@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface DotRepository extends JpaRepository<Dot, Long> {
     List<Dot> findDotsByUser(User user);
-    boolean clearByUser(User user);
 }
