@@ -37,7 +37,7 @@
         console.log('sign in account:');
         console.log(`user: ${this.user}`);
 
-        let response = await fetch("/sign_in", {
+        let response = await fetch("api/aunt/sign_in", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -51,12 +51,15 @@
           let json = response.json();
           console.log(`response body: ${json}`);
           if (!json)
-            console.log('bad data: expected { token }');
+            console.log('bad data: expected { accessToken, refreshToken }');
           else {
-            let token = json.token;
-            console.log(`get user token: ${token}`);
-            console.log('invokating token change');
-            this.$emit('update:token', token);
+            let accessToken = json.accessToken;
+            let refreshToken = json.refreshToken;
+            console.log(`get user access-token: ${accessToken}`);
+            console.log(`get user refresh-token: ${refreshToken}`);
+            console.log('invokating tokens change');
+            this.$emit('update:accessToken', accessToken);
+            this.$emit('update:refreshToken', refreshToken);
           }
         }
       },
@@ -65,11 +68,10 @@
         console.log('sign up new account:');
         console.log(`user: ${this.user}`);
 
-        let response = await fetch('/register', {
+        let response = await fetch('api/aunt/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
-            'x-mock-response-code': '201'
           },
           body: JSON.stringify(this.user)
         });
@@ -82,12 +84,15 @@
           let json = response.json();
           console.log(`response body: ${json}`);
           if (!json)
-            console.log('bad data: expected { token }');
+            console.log('bad data: expected { accessToken, refreshToken }');
           else {
-            let token = json.token;
-            console.log(`get user token: ${token}`);
-            console.log('invokating token change');
-            this.$emit('update:token', token);
+            let accessToken = json.accessToken;
+            let refreshToken = json.refreshToken;
+            console.log(`get user access-token: ${accessToken}`);
+            console.log(`get user refresh-token: ${refreshToken}`);
+            console.log('invokating tokens change');
+            this.$emit('update:accessToken', accessToken);
+            this.$emit('update:refreshToken', refreshToken);
           }
         }
       },

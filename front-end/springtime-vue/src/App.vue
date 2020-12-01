@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <logo />
-    <basic :token="token" @update:token="update" v-if="isAuthorized" />
-    <startup @update:token="update" v-else />
+    <basic :accessToken="sessionStorage.accessToken" @update:accessToken="updateAccess" :refreshToken="sessionStorage.refreshToken" @update:refreshToken="updateRefresh" v-if="isAuthorized" />
+    <startup @update:accessToken="updateAccess" @update:refreshToken="updateRefresh" v-else />
   </div>
 </template>
 
@@ -20,17 +20,23 @@
     },
     data: function() {
       return {
-        token: '',
+        sessionStorage: {
+          accessToken: '',
+          refreshToken: '',
+        },
       }
     },
     methods: {
-      update(value) {
-        this.token = value;
-      }
+      updateAccess(value) {
+        this.sessionStorage.accessToken = value;
+      },
+      updateRefresh(value) {
+        this.sessionStorage.refreshToken = value;
+      },
     },
     computed: {
       isAuthorized: function() {
-        return !((this.token === undefined) || (this.token === null) || (this.token === ''));
+        return !((this.sessionStorage.accessToken === undefined) || (this.sessionStorage.accessToken === null) || (this.sessionStorage.accessToken === ''));
       }
     }
   }

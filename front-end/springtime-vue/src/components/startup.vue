@@ -1,7 +1,7 @@
 <template>
   <div id="startup">
     <hat />
-    <loging @update:token="update" />
+    <loging @update:accessToken="updateAccess" @update:refreshToken="updateRefresh" />
   </div>
 </template>
 
@@ -16,9 +16,12 @@
       loging,
   	},
     methods: {
-      update: function(value) {
-        this.$emit('update:token', value);
-      }
+      updateAccess: function(value) {
+        this.$emit('update:accessToken', value);
+      },
+      updateRefresh: function(value) {
+        this.$emit('update:refreshToken', value);
+      },
     }
   }
 </script>
