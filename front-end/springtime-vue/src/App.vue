@@ -7,11 +7,13 @@
 </template>
 
 <script>
+  import saveState from 'vue-save-state'
   import logo from '@/components/logo'
   import startup from '@/components/startup'
   import basic from '@/components/basic'
 
   export default {
+    mixins: [saveState],
     name: 'app',
     components: {
       logo,
@@ -32,6 +34,12 @@
       },
       updateRefresh(value) {
         this.sessionStorage.refreshToken = value;
+      },
+      getSaveStateConfig: function() {
+        return { 
+          'cacheKey': 'app',
+          'saveProperties': ['sessionStorage'],
+        };
       },
     },
     computed: {

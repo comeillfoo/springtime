@@ -12,7 +12,8 @@
     "cross-spawn": "^6.0.5",
     "execa": "^1.0.0",
     "util": "^0.11.1",
-    "vue": "^2.6.12"
+    "vue": "^2.6.12",
+    "vue-save-state": "^1.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.9",
