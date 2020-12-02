@@ -1,4 +1,4 @@
-package org.comrades.springtime.controller;
+package org.comrades.springtime.controller.rest;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
 import org.comrades.springtime.module.Role;
@@ -43,7 +43,7 @@ public class AuthorizationController {
     public ResponseEntity register(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
         Map<Object, Object> response = new HashMap<>();
         try {
-            String username = authenticationRequestDto.getUsername();
+            String username = authenticationRequestDto.getLogin();
             String password = authenticationRequestDto.getPassword();
 
             if (username == null || password == null) {
@@ -72,7 +72,7 @@ public class AuthorizationController {
             response.put("refreshToken", refreshToken);
             response.put("accessToken", accessToken);
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }catch (IncorrectResultSizeDataAccessException | NonUniqueResultException ex) {
             response.put("description", ex.getMessage());
 
@@ -84,7 +84,7 @@ public class AuthorizationController {
     public ResponseEntity signIn(@RequestBody AuthenticationRequestDto authenticationRequestDto) {
         Map<Object, Object> response = new HashMap<>();
         try {
-            String username = authenticationRequestDto.getUsername();
+            String username = authenticationRequestDto.getLogin();
 
             User user = userService.findByUsername(username);
 

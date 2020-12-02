@@ -50,5 +50,5 @@
 	#hat {
     width: 100%;
     margin: 4% auto;
-  }
+    }
 </style>
