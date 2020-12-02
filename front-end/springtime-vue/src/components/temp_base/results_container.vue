@@ -14,7 +14,7 @@
 
       <tbody class="table__body">
         <tr v-for="result in results">
-          <td><div class="scrollable">{{ result.date.toUTCString() }}</div></td>
+          <td><div class="scrollable">{{ result.date.toLocaleString('ru', dateOptions) }}</div></td>
           <td><div class="scrollable">{{ result.time }}</div></td>
           <td><div class="scrollable">{{ result.x }}</div></td>
           <td><div class="scrollable special-width">{{ result.y }}</div></td>
@@ -31,6 +31,21 @@
 	export default {
     name: 'resultscontainer',
     props: ['results', ],
+    data: function() {
+      return { 
+        dateOptions: {
+          localeMatcher: 'best fit',
+          hour12: false,
+          formatMatcher: 'best fit',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        },
+      };
+    }
   }
 </script>
 
@@ -44,7 +59,7 @@
     width: 95%;
     font-family: Inconsolata, "Anonymous Pro", "Ubuntu Mono", "Lucida Console", Consolas, "Courier New", Courier, monospace;
     font-size: 18px;
-    margin: 0 auto;
+    margin: 2% auto;
     border: 1px solid #3e606f;
     border-radius: 5px;
   }
@@ -90,7 +105,45 @@
     text-align: left;
   }
 
-  .special-width {
-    width: 128px;
+  @media only all and (min-width: 1245px) {
+    .special-width {
+      width: 128px;
+    }
+
+    .table__head th {
+      font-size: 16px;
+    }
+
+    .table__body td {
+      font-size: 16px;
+    }
+  }
+
+  @media only all and (min-width: 643px) and (max-width: 1244px) {
+    .special-width {
+      width: 64px;
+    }
+
+    .table__head th {
+      font-size: 12px;
+    }
+
+    .table__body td {
+      font-size: 12px;
+    }
+  }
+
+  @media only all and (max-width: 642px) {
+    .special-width {
+      width: 32px;
+    }
+
+    .table__head th {
+      font-size: 8px;
+    }
+
+    .table__body td {
+      font-size: 8px;
+    }
   }
 </style>

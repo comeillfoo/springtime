@@ -1,6 +1,6 @@
 <template>
   <div id="basic">
-    <div id="container">
+    <div id="top-container">
       <div id="form-container">
         <h4 class="text__title">Форма</h4>
         <form id="result">
@@ -20,21 +20,26 @@
               <option v-for="value in xValues">{{ value }}</option>
             </select>
           </fieldset>
-          <fieldset class="separated">
+          <fieldset class="inlines__align--center">
             <button @click.prevent="check" class="btn">проверить</button>
           </fieldset>
         </form>
 
       </div>
-      <div id="area-container">
+
+      <div id="area-container" class="inlines__align--center">
         <h4 class="text__title">Рабочая область</h4>
-        <canvas id="area" ref="area" width="643" height="643" @click="checkArea">
-          Canvas not supported
-        </canvas>
+        <div id="area-subcontainer">
+          <canvas id="area" ref="area" width="600" height="600" @click="checkArea">
+            Canvas not supported
+          </canvas>
+        </div>
       </div>
+
     </div>
     <loader v-if="isLoading" /><resultscontainer v-bind:results="results" v-else-if="results.length" />
-    <p class="empty-results" v-else>результаты отсутствуют</p><div id="close-container">
+    <p class="empty-results" v-else>результаты отсутствуют</p>
+    <div id="close-container" class="inlines__align--center">
       <button @click="signout" class="btn">закрыть сессию</button>
     </div>
   </div>
@@ -55,7 +60,6 @@
       resultscontainer,
       loader,
     },
-
     data: function() {
       return {
         rValues: baseValues,
@@ -72,16 +76,9 @@
         return this.result.r;
       },
     },
-    watch: {
-      radius: function(value) {
-        this.redraw(value);
-      },
-      results: function(value) {
-        this.drawDots(value);
-      }
-    },
     methods: {
       translateTo: function(realCoordinate, fieldSize, length, proportion) {
+        console.log(`length: ${ length }, real coordinate: ${ realCoordinate }, field size: ${ fieldSize }, proportion: ${ proportion }`);
         return length * (realCoordinate - fieldSize / 2) / (fieldSize * proportion);
       },
       translateFrom: function(imagCoordinate, fieldSize, length, proportion) {
@@ -181,9 +178,9 @@
         ctx.strokeStyle = '#000000';
         ctx.fillStyle = '#000000';
         console.log('drawing signed horizontal arrow');
-        this.drawSignedHorizontalArrow(ctx, 2 * x, y, length, 'y');
+        this.drawSignedHorizontalArrow(ctx, 2 * x, y, length, 'x');
         console.log('drawing signed vertical arrow');
-        this.drawSignedVerticalArrow(ctx, x, 0, length, 'x');
+        this.drawSignedVerticalArrow(ctx, x, 0, length, 'y');
       },
 
       drawSignedHorizontalNotch: function(ctx, x, y, length, text) {
@@ -377,7 +374,7 @@
       },
 
       drawDots: function(results) {
-        console.log(`${ results }`);
+        console.log(`previous results: ${ results }`);
         if (!results.length)
           console.log('no any results in the table');
         else {
@@ -390,7 +387,7 @@
           for (let i = 0; i < results.length; ++i) {
             console.log(`putting dot: ${results[i]}`);
             console.log(`x: ${ results[i].x }; y: ${ results[i].y }`);
-            ctx.fillSyle = results[i].hit? "#000000" : "#cd0000";
+            ctx.fillStyle = results[i].hit? "#000000" : "#cd0000";
             console.log('translating coordinates');
             const realX = this.translateFrom(results[i].x, width, maxRadius, part);
             const realY = this.translateFrom(-results[i].y, height, maxRadius,part);
@@ -398,7 +395,7 @@
 
             console.log('putting dots');
             ctx.beginPath();
-            ctx.arc(realX, realY, maxRadius, 0, 2*Math.PI, true);
+            ctx.arc(realX, realY, width * part / 100, 0, 2*Math.PI, true);
             ctx.fill();
             ctx.stroke();
             ctx.closePath();
@@ -459,7 +456,7 @@
           console.log(`mouse y: ${ realY }`);
 
           console.log('translating to y value');
-          const y = this.translateTo(realY, area.height, maxRadius, part);
+          const y = -this.translateTo(realY, area.height, maxRadius, part);
           console.log(`y translated to: ${ y }`);
           this.result.y = y;
 
@@ -498,7 +495,7 @@
         } else {
           console.log('bad response');
           console.log(`response status: ${response.status}`);
-          this.results = [ { date: new Date(), time: 0, x: 4, y: 4, r: 4, hit: true }];
+          this.results = [ { date: new Date(), time: 0, x: 4, y: 4, r: 4, hit: true }, { date: new Date(), time: 2, x: 3, y: -4, r: 3, hit: false }];
         }
         this.isLoading = false;
       },
@@ -506,6 +503,14 @@
     mounted() {
       this.retrieve();
       this.redraw(this.radius);
+    },
+    updated() {
+      this.drawDots(this.results);
+    },
+    watch: {
+      radius: function(value) {
+        this.redraw(this.radius);
+      },
     }
   }
 </script>
@@ -519,27 +524,21 @@
     padding: 0;
   }
 
-  #area {
-    width: 90%;
-    height: auto;
+  /**
+   * Form area container
+   */
+
+  #top-container {
+    width: 95%;
+    vertical-align: top;
+    margin: 4% auto;
   }
 
-  #container {
-    display: block;
-  }
+  /**
+   * form 
+   */
 
-  #area-container {
-    display: block;
-    width: 45%;
-    margin: 2% auto;
-    text-align: center;
-  }
-
-  #form-container {
-    display: block;
-    width: 45%;
-    margin: 2% auto;
-  }
+  form
 
   .btn {
     border: 0;
@@ -560,14 +559,6 @@
     background-color: #5e808f;
   }
 
-  #area-container {
-    border: 1px solid #c6c9cc;
-    border-radius: 5px;
-  }
-
-  #form-container {
-  }
-
   #result input, select {
     border: 1px solid #c6c9cc;
     border-radius: 5px;
@@ -575,15 +566,6 @@
     display: block;
     margin: 1% 0 4% 0;
     padding: 1% 2%;
-  }
-
-  .separated {
-    text-align: center;
-  }
-
-
-  #close-container {
-    text-align: center;
   }
 
   #result label {
@@ -596,6 +578,30 @@
     border: 1px solid #c6c9cc;
     border-radius: 5px;
     margin: 2% 0;
+    width: 100%;
+  }
+
+  /**
+   * area
+   */
+
+  #area-subcontainer {
+    border: 1px solid #c6c9cc;
+    border-radius: 5px;
+    padding: 2%;
+  }
+
+  #area-subcontainer {
+    width: 100%;
+    height: 100%;
+  }
+
+  /**
+   * typography
+   */
+
+  .inlines__align--center {
+    text-align: center;
   }
 
   .text__title {
@@ -616,6 +622,31 @@
   }
 
   @media only all and (min-width: 1245px) {
+
+    #area-subcontainer {
+      width: 100%;
+      height: 100%;
+      padding: 4%;
+    }
+
+    #area-container {
+      width: 720px;
+      height: 720px;
+      display: inline-block;
+      margin: 0;
+      float: right;
+    }
+
+    #form-container {
+      display: inline-block;
+      margin: 2% 0;
+      width: 40%;
+    }
+
+    #top-container {
+      vertical-align: top;
+      display: table;
+    }
   }
 
   @media only all and (min-width: 643px) and (max-width: 1244px) {
@@ -633,17 +664,60 @@
       font-size: 18px;
       line-height: 32px;
     }
-  }
 
-  @media only all and (max-width: 642px) {
-    #result {
+    #form-container {
+      display: block;
+      margin: 0 auto;
+      width: 45%;
+    }
+
+    #area-subcontainer {
+      width: 100%;
+      height: 100%;
+    }
+
+    #area-container {
+      width: 700px;
+      height: 700px;
       display: block;
       margin: 0 auto;
     }
+  }
+
+  @media only all and (max-width: 642px) {
 
     .empty-results {
       font-size: 12;
       line-height: 22px;
+    }
+
+    #form-container {
+      display: block;
+      margin: 2% auto;
+      width: 95%;
+    }
+
+    #area-subcontainer {
+      width: 100%;
+      max-height: 90%;
+      padding: 2%;
+    }
+
+    #area-container {
+      width: 340px;
+      height: 400px;
+      display: block;
+      margin: 8% auto;
+    }
+
+    #area {
+      width: 320px;
+      height: 320px;
+    }
+
+    #top-container {
+      width: 95%;
+      margin: 8% auto;
     }
   }
 </style>
