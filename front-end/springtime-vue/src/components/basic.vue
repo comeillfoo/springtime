@@ -55,11 +55,11 @@
 
   export default {
     name: 'basic',
-    props: ['accessToken', 'refreshToken', ],
     components: {
       resultscontainer,
       loader,
     },
+    props: ['access', 'refresh',],
     data: function() {
       return {
         rValues: baseValues,
@@ -338,8 +338,9 @@
             console.log(`get refresh token: ${ refreshToken }`);
             let accessToken = json.accessToken;
             console.log(`get access token: ${ accessToken }`);
-            this.$emit('update:refreshToken', refreshToken);
-            this.$emit('update:accessToken', accessToken);
+            this.$session.set(this.access, refreshToken);
+            this.$session.set(this.refresh, accessToken);
+            window.location.reload();
             repeat = repeat.bind(this);
             repeat(args);
 
@@ -467,8 +468,8 @@
 
       signout: function(event) {
         console.log('close current session...');
-        this.$emit('update:accessToken', '');
-        this.$emit('update:refreshToken', '')
+        this.$session.clear();
+        window.location.reload();
       },
 
       retrieve: async function() {

@@ -22,6 +22,7 @@
 <script>
   export default {
     name: 'loging',
+    props: ['access', 'refresh'],
     data: function() {
       return { 
         user: {
@@ -30,10 +31,14 @@
         },
       };
     },
-
-
     methods: {
       signin: async function(event) {
+
+        this.$session.set(this.access, '12345');
+        this.$session.set(this.refresh, '12345');
+        window.location.reload();
+        return;
+
         console.log('sign in account:');
         console.log(`user: ${this.user}`);
 
@@ -58,8 +63,9 @@
             console.log(`get user access-token: ${accessToken}`);
             console.log(`get user refresh-token: ${refreshToken}`);
             console.log('invokating tokens change');
-            this.$emit('update:accessToken', accessToken);
-            this.$emit('update:refreshToken', refreshToken);
+            this.$session.set(this.access, accessToken);
+            this.$session.set(this.refresh, refreshToken);
+            window.location.reload();
           }
         }
       },
@@ -91,8 +97,8 @@
             console.log(`get user access-token: ${accessToken}`);
             console.log(`get user refresh-token: ${refreshToken}`);
             console.log('invokating tokens change');
-            this.$emit('update:accessToken', accessToken);
-            this.$emit('update:refreshToken', refreshToken);
+            this.$session.set(this.access, accessToken);
+            this.$session.set(this.refresh, refreshToken);
           }
         }
       },

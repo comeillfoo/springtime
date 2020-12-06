@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <logo />
-    <basic :accessToken="sessionStorage.accessToken" @update:accessToken="updateAccess" :refreshToken="sessionStorage.refreshToken" @update:refreshToken="updateRefresh" v-if="isAuthorized" />
-    <startup @update:accessToken="updateAccess" @update:refreshToken="updateRefresh" v-else />
+    <basic :access="accessTokenName" :refresh="refreshTokenName" v-if="isAuthorized" />
+    <startup :access="accessTokenName" :refresh="refreshTokenName" v-else />
   </div>
 </template>
 
@@ -13,7 +13,6 @@
   import basic from '@/components/basic'
 
   export default {
-    mixins: [saveState],
     name: 'app',
     components: {
       logo,
@@ -22,31 +21,18 @@
     },
     data: function() {
       return {
-        sessionStorage: {
-          accessToken: '',
-          refreshToken: '',
-        },
-      }
-    },
-    methods: {
-      updateAccess(value) {
-        this.sessionStorage.accessToken = value;
-      },
-      updateRefresh(value) {
-        this.sessionStorage.refreshToken = value;
-      },
-      getSaveStateConfig: function() {
-        return { 
-          'cacheKey': 'app',
-          'saveProperties': ['sessionStorage'],
-        };
-      },
+        accessTokenName: 'accessToken',
+        refreshTokenName: 'refreshToken',
+      };
     },
     computed: {
+      access: function() {
+        return this.$session.get(this.accessTokenName);
+      },
       isAuthorized: function() {
-        return !((this.sessionStorage.accessToken === undefined) || (this.sessionStorage.accessToken === null) || (this.sessionStorage.accessToken === ''));
-      }
-    }
+        return !((this.access === undefined) || (this.access === null) || (this.access === ''));
+      },
+    },
   }
 </script>
 

@@ -13,7 +13,8 @@
     "execa": "^1.0.0",
     "util": "^0.11.1",
     "vue": "^2.6.12",
-    "vue-save-state": "^1.2.0"
+    "vue-save-state": "^1.2.0",
+    "vue-sessionstorage": "^1.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.9",

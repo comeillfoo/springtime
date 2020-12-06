@@ -1,7 +1,7 @@
 <template>
   <div id="startup">
     <hat />
-    <loging @update:accessToken="updateAccess" @update:refreshToken="updateRefresh" />
+    <loging :access="access" :refresh="refresh" />
   </div>
 </template>
 
@@ -11,17 +11,10 @@
 
   export default {
     name: 'startup',
+    props: ['access', 'refresh'],
   	components: {
   		hat,
       loging,
   	},
-    methods: {
-      updateAccess: function(value) {
-        this.$emit('update:accessToken', value);
-      },
-      updateRefresh: function(value) {
-        this.$emit('update:refreshToken', value);
-      },
-    }
   }
 </script>
