@@ -61,3 +61,8 @@ The fourth problem in web-programming discipline. It have the same idea as 3rd p
 20. Angular: модули, компоненты, сервисы и DI.
 21. Angular: шаблоны страниц, жизненный цикл компонентов, подлкючение CSS.
 22. Angular: клиент-серверное взаимодействие, создание, отправка и валидация данных форм.
+
+### Использованные npm-пакеты:
+
++ [vue-sessionstorage](https://www.npmjs.com/package/vue-sessionstorage)
++ [vue-save-state](https://github.com/spatie/vue-save-state) *deprecated*
