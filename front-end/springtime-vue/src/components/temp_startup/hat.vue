@@ -50,5 +50,6 @@
 	#hat {
     width: 100%;
     margin: 4% auto;
+	min-height: 50vh;
     }
 </style>

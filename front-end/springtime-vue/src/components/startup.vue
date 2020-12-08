@@ -1,8 +1,8 @@
 <template>
   <div id="startup">
-    <hat />
     <loging :access="access" :refresh="refresh" />
   </div>
+
 </template>
 
 <script>
@@ -18,3 +18,9 @@
   	},
   }
 </script>
+
+<style>
+  #startup {
+    min-height: 70vh;
+  }
+</style>

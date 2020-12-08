@@ -33,12 +33,6 @@
     },
     methods: {
       signin: async function(event) {
-
-        this.$session.set(this.access, '12345');
-        this.$session.set(this.refresh, '12345');
-        window.location.reload();
-        return;
-
         console.log('sign in account:');
         console.log(`user: ${this.user}`);
 
@@ -58,14 +52,16 @@
           if (!json)
             console.log('bad data: expected { accessToken, refreshToken }');
           else {
-            let accessToken = json.accessToken;
-            let refreshToken = json.refreshToken;
-            console.log(`get user access-token: ${accessToken}`);
-            console.log(`get user refresh-token: ${refreshToken}`);
-            console.log('invokating tokens change');
-            this.$session.set(this.access, accessToken);
-            this.$session.set(this.refresh, refreshToken);
-            window.location.reload();
+
+            json.then(data => {
+                console.log(`get user access-token: got`);
+                console.log(`get user refresh-token: got`);
+
+                this.$session.set(this.access, data.accessToken);
+                this.$session.set(this.refresh, data.refreshToken);
+
+                window.location.reload();
+            });
           }
         }
       },
@@ -92,13 +88,16 @@
           if (!json)
             console.log('bad data: expected { accessToken, refreshToken }');
           else {
-            let accessToken = json.accessToken;
-            let refreshToken = json.refreshToken;
-            console.log(`get user access-token: ${accessToken}`);
-            console.log(`get user refresh-token: ${refreshToken}`);
-            console.log('invokating tokens change');
-            this.$session.set(this.access, accessToken);
-            this.$session.set(this.refresh, refreshToken);
+
+              json.then(data => {
+                  console.log(`get user access-token: got`);
+                  console.log(`get user refresh-token: got`);
+
+                  this.$session.set(this.access, data.accessToken);
+                  this.$session.set(this.refresh, data.refreshToken);
+
+                  window.location.reload();
+              });
           }
         }
       },
@@ -109,32 +108,44 @@
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap%27');
 
   #loging {
+    background: #fff;
     display: block;
-    width: 45%;
+    width: 40%;
     margin: 0 auto;
   }
 
+  #login-form {
+      margin-top: 23vh;
+      box-shadow: 0 0 10px rgba(0,0,0,.3);
+  }
+
   #login-form input {
+    margin: auto;
+    width: 90%;
     border: 1px solid #c6c9cc;
     border-radius: 5px;
     color: #555;
     display: block;
-    margin: 1% 0 4% 0;
     padding: 1% 2%;
+    height: 50px;
   }
 
   #login-form label {
+    padding: 5%;
     color: #3e606f;
-    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+    font-family: Satisfy,Lato,Open Sans,Roboto,sans-serif;
     text-transform: capitalize;
+    font-size: 120%
   }
 
   #login-form fieldset {
-    border: 1px solid #c6c9cc;
+    padding: 4%;
+    border: 1px solid #fff;
     border-radius: 5px;
-    margin: 2% 0;
+    margin: 1% 1%;
   }
 
   .btn {
@@ -147,6 +158,8 @@
     padding: 2% 5%;
     background-color: #3e606f;
     color: #eaeaea;
+    font-family: 'Pacifico', cursive;
+    font-size: 18px;
   }
 
   .btn:hover {

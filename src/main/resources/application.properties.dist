@@ -1,0 +1,8 @@
+spring.datasource.url = ${DATASOURCE_URL}
+spring.datasource.username = ${DATASOURCE_USERNAME}
+spring.datasource.password = ${DATASOURCE_PASS}
+
+spring.jpa.hibernate.ddl-auto = update
+
+token.expire_time = ${EXPIRE_TIME}
+secret.key = ${SECRET_KEY}

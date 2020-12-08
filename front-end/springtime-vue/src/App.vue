@@ -3,6 +3,8 @@
     <logo />
     <basic :access="accessTokenName" :refresh="refreshTokenName" v-if="isAuthorized" />
     <startup :access="accessTokenName" :refresh="refreshTokenName" v-else />
+    <hat v-if="!isAuthorized"/>
+    <basement/>
   </div>
 </template>
 
@@ -11,6 +13,8 @@
   import logo from '@/components/logo'
   import startup from '@/components/startup'
   import basic from '@/components/basic'
+  import hat from '@/components/temp_startup/hat'
+  import basement from '@/components/basement'
 
   export default {
     name: 'app',
@@ -18,6 +22,8 @@
       logo,
       startup,
       basic,
+      hat,
+      basement,
     },
     data: function() {
       return {
@@ -50,6 +56,12 @@
     color: #efefef;
     margin: 0 auto;
     padding: 0;
+  }
+
+  body {
+    margin: 0;
+    background: #c5f4fa url("assets/back_ground (11).png") 0px 74vh no-repeat;
+    background-size: cover;
   }
 
   @media only all and (min-width: 1245px) {

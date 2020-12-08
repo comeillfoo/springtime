@@ -518,6 +518,7 @@
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap%27');
 
   #basic {
     width: 100%;
@@ -541,20 +542,6 @@
 
   form
 
-  .btn {
-    border: 0;
-    border-radius: 5px;
-    cursor: pointer;
-    display: inline-block;
-    letter-spacing: .5px;
-    margin: 2% 2%;
-    padding: 11px 30px;
-    background-color: #3e606f;
-    color: #eaeaea;
-    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
-    text-transform: capitalize;
-    font-size: 12px;
-  }
 
   .btn:hover {
     background-color: #5e808f;
@@ -603,14 +590,6 @@
 
   .inlines__align--center {
     text-align: center;
-  }
-
-  .text__title {
-    font-size: 16px;
-    line-height: 44px;
-    color: #3e606f;
-    margin: 0;
-    font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
   }
 
   .empty-results {
