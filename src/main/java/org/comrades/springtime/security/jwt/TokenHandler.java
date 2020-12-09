@@ -94,9 +94,9 @@ public class TokenHandler implements Tokenable {
 
     @Override
     public String resolveToken(HttpServletRequest req) throws TokenNotProvidedException {
-        String tokenShell = req.getHeader("Authorization");
-        if (tokenShell != null && tokenShell.startsWith("shell_")) {
-            return tokenShell.substring(6);
+        String token = req.getHeader("shell_token");
+        if (token != null) {
+            return token;
         }
         throw new TokenNotProvidedException("Token not found in headers.");
     }

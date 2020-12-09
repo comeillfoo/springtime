@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <logo />
-    <basic :access="accessTokenName" :refresh="refreshTokenName" v-if="isAuthorized" />
-    <startup :access="accessTokenName" :refresh="refreshTokenName" v-else />
+    <basic :access="accessTokenName" :refresh="refreshTokenName" />
+    <startup :access="accessTokenName" :refresh="refreshTokenName" />
     <hat v-if="!isAuthorized"/>
     <basement/>
   </div>
@@ -35,6 +35,9 @@
       access: function() {
         return this.$session.get(this.accessTokenName);
       },
+      refresh: function() {
+        return this.$session.get(this.refreshTokenName);
+      },
       isAuthorized: function() {
         return !((this.access === undefined) || (this.access === null) || (this.access === ''));
       },
@@ -63,6 +66,8 @@
     background: #c5f4fa url("assets/back_ground (11).png") 0px 74vh no-repeat;
     background-size: cover;
   }
+
+
 
   @media only all and (min-width: 1245px) {
     #wrap {

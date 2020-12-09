@@ -1,6 +1,17 @@
 <template>
   <div id="basic">
+
     <div id="top-container">
+
+      <div id="area-container" class="inlines__align--center">
+        <h4 class="text__title">Рабочая область</h4>
+        <div id="area-subcontainer">
+          <canvas id="area" ref="area" width="600" height="600" @click="checkArea">
+            Canvas not supported
+          </canvas>
+        </div>
+      </div>
+
       <div id="form-container">
         <h4 class="text__title">Форма</h4>
         <form id="result">
@@ -24,24 +35,16 @@
             <button @click.prevent="check" class="btn">проверить</button>
           </fieldset>
         </form>
-
-      </div>
-
-      <div id="area-container" class="inlines__align--center">
-        <h4 class="text__title">Рабочая область</h4>
-        <div id="area-subcontainer">
-          <canvas id="area" ref="area" width="600" height="600" @click="checkArea">
-            Canvas not supported
-          </canvas>
-        </div>
       </div>
 
     </div>
+
     <loader v-if="isLoading" /><resultscontainer v-bind:results="results" v-else-if="results.length" />
     <p class="empty-results" v-else>результаты отсутствуют</p>
     <div id="close-container" class="inlines__align--center">
       <button @click="signout" class="btn">закрыть сессию</button>
     </div>
+
   </div>
 </template>
 
@@ -314,35 +317,29 @@
       },
 
       fetchToken: async function(repeat, ...args) {
-        console.log(`current access-token expired: ${this.accessToken}`);
-        console.log('fetching new one');
 
         let response = await fetch("/api/refresh/token", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8'
           },
-          body: JSON.stringify(this.refreshToken),
+          body: JSON.stringify({ refreshToken : this.$session.get(this.refresh)}),
         });
 
         console.log('check if response is ok');
         if (response.ok) {
 
-          console.log('successful fetching new tokens');
+          console.log('successful fetching new token');
           console.log('getting json object');
           let json = response.json();
           if (!json) {
 
-            console.log(`fetched from backend ${ json }`);
-            let refreshToken = json.refreshToken;
-            console.log(`get refresh token: ${ refreshToken }`);
-            let accessToken = json.accessToken;
-            console.log(`get access token: ${ accessToken }`);
-            this.$session.set(this.access, refreshToken);
-            this.$session.set(this.refresh, accessToken);
-            window.location.reload();
-            repeat = repeat.bind(this);
-            repeat(args);
+            json.then(data => {
+              this.$session.set(this.access, data.accessToken);
+              window.location.reload();
+              repeat = repeat.bind(this);
+              repeat(args);
+            });
 
           } else console.log('empty response body');
 
@@ -358,17 +355,18 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
-            'shell_token': this.accessToken,
+            'shell_token': this.$session.get(this.access),
           },
           body: JSON.stringify(this.result)
         });
 
         console.log('request sent checking if response is ok (201)');
-        if (response.status === 201)
-          console.log('response is ok (201)');
-        else if (response.status === 403) {
+        if (response.status === 201) {
+        console.log('response is ok (201)');
+        await this.retrieve();
+        }else if (response.status === 403) {
           console.log('access token expired');
-          this.fetchToken(this.fetchResult);
+          await this.fetchToken(this.fetchResult);
         } else
           console.log('bad response');
         console.log(`response status: ${response.status}`);
@@ -479,7 +477,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
-            'shell_token': this.accessToken,
+            'shell_token': this.$session.get(this.access),
           },
           body: JSON.stringify(this.accessToken)
         });
@@ -492,11 +490,10 @@
           this.results = json;
         } else if (response.status === 403) {
           console.log('access token expired');
-          this.fetchToken(this.retrieve)
+          await this.fetchToken(this.retrieve)
         } else {
           console.log('bad response');
           console.log(`response status: ${response.status}`);
-          this.results = [ { date: new Date(), time: 0, x: 4, y: 4, r: 4, hit: true }, { date: new Date(), time: 2, x: 3, y: -4, r: 3, hit: false }];
         }
         this.isLoading = false;
       },
@@ -522,8 +519,8 @@
 
   #basic {
     width: 100%;
-    margin: 0;
     padding: 0;
+    margin-top: 10vh;
   }
 
   /**
@@ -531,9 +528,10 @@
    */
 
   #top-container {
-    width: 95%;
-    vertical-align: top;
-    margin: 4% auto;
+    width:100%
+  }
+  #area-container {
+    padding: 0 10%;
   }
 
   /**
@@ -576,7 +574,6 @@
   #area-subcontainer {
     border: 1px solid #c6c9cc;
     border-radius: 5px;
-    padding: 2%;
   }
 
   #area-subcontainer {
@@ -606,21 +603,20 @@
     #area-subcontainer {
       width: 100%;
       height: 100%;
-      padding: 4%;
     }
 
     #area-container {
-      width: 720px;
-      height: 720px;
       display: inline-block;
-      margin: 0;
       float: right;
+      width: auto;
+      height: auto;
+      padding-top: 5%;
     }
 
     #form-container {
       display: inline-block;
-      margin: 2% 0;
       width: 40%;
+      padding: 10% 0 10% 10%;
     }
 
     #top-container {
@@ -657,8 +653,6 @@
     }
 
     #area-container {
-      width: 700px;
-      height: 700px;
       display: block;
       margin: 0 auto;
     }
@@ -680,12 +674,9 @@
     #area-subcontainer {
       width: 100%;
       max-height: 90%;
-      padding: 2%;
     }
 
     #area-container {
-      width: 340px;
-      height: 400px;
       display: block;
       margin: 8% auto;
     }

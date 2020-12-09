@@ -11,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/main/app/**")
@@ -54,8 +51,7 @@ public class MainController {
 
         dot.setUser(null);
 
-        return ResponseEntity.ok(Collections.singleton(dot));
-//        return getEveryUserDot();
+        return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonList(dot));
     }
 
     @PostMapping("/clear")
