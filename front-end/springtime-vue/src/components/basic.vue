@@ -364,9 +364,10 @@
         });
 
         console.log('request sent checking if response is ok (201)');
-        if (response.status === 201)
+        if (response.status === 201) {
           console.log('response is ok (201)');
-        else if (response.status === 403) {
+          this.retrieve();
+        } else if (response.status === 403) {
           console.log('access token expired');
           this.fetchToken(this.fetchResult);
         } else

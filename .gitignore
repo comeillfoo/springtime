@@ -19,6 +19,7 @@ target/
 *.iml
 *.ipr
 /front-end/springtime-vue/node_modules/
+/src/main/resources/application.properties
 
 ### NetBeans ###
 /nbproject/private/
