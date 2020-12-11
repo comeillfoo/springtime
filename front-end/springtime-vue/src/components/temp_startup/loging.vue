@@ -10,7 +10,7 @@
         <label>пароль</label>
         <input type="password" placeholder="qwerty" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
       </fieldset>
-
+          <a id="err_message" ></a>
       <fieldset class="separated">
         <button @click="signin" title="Кнопка для входа в существующий аккаунт" class="btn">Войти</button>
         <button @click="signup" title="Кнопка для создания нового аккаунта" class="btn">Зарегистрироваться</button>
@@ -32,6 +32,10 @@
       };
     },
     methods: {
+        createMessage: async function(message) {
+            let field = document.getElementById('err_message');
+            field.innerText = message;
+        },
       signin: async function(event) {
         console.log('sign in account:');
         console.log(`user: ${this.user}`);
@@ -63,6 +67,10 @@
                 window.location.reload();
             });
           }
+        }else {
+            response.json().then(data => {
+                this.createMessage(`*${data.description}`);
+            });
         }
       },
 
@@ -99,6 +107,10 @@
                   window.location.reload();
               });
           }
+        }else {
+            response.json().then(data => {
+                this.createMessage(`*${data.description}`);
+            });
         }
       },
     }
@@ -110,12 +122,12 @@
   @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap%27');
 
-      #loging {
-        background: #fff;
-        display: block;
-        width: 40%;
-        margin: 0 auto;
-      }
+  #loging {
+    background: #fff;
+    display: block;
+    width: 40%;
+    margin: 0 auto;
+  }
 
   #login-form {
       margin-top: 23vh;
@@ -146,6 +158,13 @@
     border: 1px solid #fff;
     border-radius: 5px;
     margin: 1% 1%;
+  }
+
+  #err_message {
+      font-size: 100%;
+      font-style: italic;
+      margin-left: 10%;
+      color: #cd1a21
   }
 
   .btn {

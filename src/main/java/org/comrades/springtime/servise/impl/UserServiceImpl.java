@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
             //TODO: log UserNotFoundException
             throw new UserNotFoundException(ex.getMessage());
         }
-        if (user == null) throw new UserNotFoundException("");
+        if (user == null) throw new UserNotFoundException("User not found.");
         return user;
     }
 

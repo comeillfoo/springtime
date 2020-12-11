@@ -97,7 +97,8 @@ public class AuthorizationController {
 
             return ResponseEntity.ok(response);
         }catch (UserNotFoundException | AuthenticationException ex) {
-            response.put("description","Wrong login or password.");
+            if (ex instanceof UserNotFoundException) response.put("description", ex.getMessage());
+            else response.put("description", "Wrong login or password.");
 
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
         }
