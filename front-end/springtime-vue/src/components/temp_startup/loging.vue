@@ -110,12 +110,12 @@
   @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap%27');
 
-  #loging {
-    background: #fff;
-    display: block;
-    width: 40%;
-    margin: 0 auto;
-  }
+      #loging {
+        background: #fff;
+        display: block;
+        width: 40%;
+        margin: 0 auto;
+      }
 
   #login-form {
       margin-top: 23vh;
@@ -134,7 +134,7 @@
   }
 
   #login-form label {
-    padding: 5%;
+    padding: 0 5% ;
     color: #3e606f;
     font-family: Satisfy,Lato,Open Sans,Roboto,sans-serif;
     text-transform: capitalize;
@@ -168,6 +168,23 @@
 
   .separated {
     text-align: center;
+  }
+
+  @media only all and (min-width: 643px) and (max-width: 1244px) {
+      #login-form {
+          display: block;
+          height: 100%;
+          width: 100%;
+      }
+
+      #login-form label {
+          font-size: 160%;
+      }
+
+
+      #loging {
+          width: 50%;
+      }
   }
 
   @media only all and (max-width: 642px) {

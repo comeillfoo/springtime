@@ -54,7 +54,7 @@
 
   .text__title {
     font-weight: 700;
-    font-size: 25px;
+    font-size: 150%;
     line-height: 44px;
     color: #2a2a2a;
     margin: 0;
@@ -62,7 +62,7 @@
 
   .text__subtitle {
     color: #2a2a2a;
-    font-size: 20px;
+    font-size: 120%;
     font-weight: 400;
     margin: 0;
     font-style: italic;
@@ -78,13 +78,12 @@
     }
 
     .text__title {
-      font-size: 18px;
+      font-size: 62px;
       line-height: 32px;
     }
 
     .text__subtitle {
-      color: #a9b2b9;
-      font-size: 12px;
+      font-size: 20px;
       font-weight: 400;
     }
   }
@@ -99,12 +98,12 @@
     }
 
     .text__title {
-      font-size: 16px;
+      font-size: 20px;
       line-height: 22px;
     }
 
     .text__subtitle {
-      font-size: 12px;
+      font-size: 17px;
       font-weight: 400;
     }
   }
