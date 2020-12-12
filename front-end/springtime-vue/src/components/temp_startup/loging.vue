@@ -29,7 +29,7 @@
           login: '',
           password: '',
         },
-        minPasswordLength: 10,
+        minPasswordLength: 8,
       };
     },
     computed: {
@@ -38,14 +38,17 @@
       },
     },
     methods: {
-        createMessage: async function(message) {
-            let field = document.getElementById('err_message');
-            field.innerText = message;
-        },
+      createMessage: async function(message) {
+        console.error(message);
+        let field = document.getElementById('err_message');
+        field.innerText = message;
+      },
+
       signin: async function(event) {
         console.log('sign in account:');
         console.log(`user: ${this.user}`);
 
+        console.log('fetching tokens from server...');
         let response = await fetch("api/aunt/sign_in", {
           method: 'POST',
           headers: {
@@ -57,33 +60,28 @@
         console.log('check if response is ok (200)');
         if (response.ok) {
           console.log('response 200; get token');
-          let json = response.json();
+          let json = await response.json();
           console.log(`response body: ${json}`);
-          if (!json)
+          if (!json) {
             console.log('bad data: expected { accessToken, refreshToken }');
-          else {
+            this.createMessage(`*${json}`);
+          } else {
+            console.log(`got user access-token`);
+            console.log(`got user refresh-token`);
 
-            json.then(data => {
-                console.log(`get user access-token: got`);
-                console.log(`get user refresh-token: got`);
+            this.$session.set(this.access, json.accessToken);
+            this.$session.set(this.refresh, json.refreshToken);
 
-                this.$session.set(this.access, data.accessToken);
-                this.$session.set(this.refresh, data.refreshToken);
-
-                window.location.reload();
-            });
+            window.location.reload();
           }
-        }else {
-            response.json().then(data => {
-                this.createMessage(`*${data.description}`);
-            });
-        }
+        } else this.createMessage(`*Error: ${response.statusText} ${response.status}`);
       },
 
       signup: async function(event) {
         console.log('sign up new account:');
         console.log(`user: ${this.user}`);
-
+        
+        console.log('fetching tokens from server...');
         let response = await fetch('api/aunt/register', {
           method: 'POST',
           headers: {
@@ -92,32 +90,25 @@
           body: JSON.stringify(this.user)
         });
 
-        console.log('sent request')
+        console.log('sent request');
         console.log('check if status 201');
 
         if (response.status === 201) {
           console.log('user created');
-          let json = response.json();
+          let json = await response.json();
           console.log(`response body: ${json}`);
           if (!json)
             console.log('bad data: expected { accessToken, refreshToken }');
           else {
+            console.log('got user access-token');
+            console.log('get user refresh-token');
 
-              json.then(data => {
-                  console.log(`get user access-token: got`);
-                  console.log(`get user refresh-token: got`);
+            this.$session.set(this.access, json.accessToken);
+            this.$session.set(this.refresh, json.refreshToken);
 
-                  this.$session.set(this.access, data.accessToken);
-                  this.$session.set(this.refresh, data.refreshToken);
-
-                  window.location.reload();
-              });
+            window.location.reload();
           }
-        }else {
-            response.json().then(data => {
-                this.createMessage(`*${data.description}`);
-            });
-        }
+        } else this.createMessage(`*Error: ${response.statusText} ${response.status}`);
       },
     }
   }

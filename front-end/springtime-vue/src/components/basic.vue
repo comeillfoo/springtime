@@ -180,6 +180,7 @@
         console.log('drawing vertical arrow');
         this.drawVerticalArrow(ctx, 2 * x, y, length);
       },
+
       drawSignedArrows: function(ctx, x, y, length) {
         ctx.strokeStyle = '#000000';
         ctx.fillStyle = '#000000';
@@ -195,12 +196,14 @@
         ctx.fillText(text, x + length, y + length / 2);
         this.drawHorizontalLine(ctx, x - length / 2, y, length);
       },
+
       drawSignedVerticalNotch: function(ctx, x, y, length, text) {
         ctx.strokeStyle = '#000000';
         ctx.fillStyle = '#000000';
         ctx.fillText(text, x - length, y - length);
         this.drawVerticalLine(ctx, x, y - length / 2, length);
       },
+
       tempdraw: function(title) {
         console.log('drawing template');
         let canvas = this.$refs.area;
@@ -243,6 +246,7 @@
         console.log('template drew');
 
       },
+
       basedraw: function(title) {
         console.log('drawing with real radius');
         let canvas = this.$refs.area;
@@ -321,6 +325,7 @@
 
       fetchToken: async function(repeat, ...args) {
 
+        console.log('fetching tokens from server...');
         let response = await fetch("/api/refresh/token", {
           method: 'POST',
           headers: {
@@ -333,27 +338,30 @@
         if (response.ok) {
 
           console.log('successful fetching new token');
-          console.log('getting json object');
-          let json = response.json();
+          console.log('getting json object...');
+          let json = await response.json();
           if (!json) {
+            this.$session.set(this.access, json.accessToken);
+            window.location.reload();
+            repeat = repeat.bind(this);
+            console.log('repeating losed operation...');
+            repeat(args);
+          } else console.error('empty response body');
 
-            json.then(data => {
-              this.$session.set(this.access, data.accessToken);
-              window.location.reload();
-              repeat = repeat.bind(this);
-              repeat(args);
-            });
-
-          } else console.log('empty response body');
-
-        } else console.log('bad response');
+        } else console.error(`bad response ${response.status} ${response.statusText}`);
       },
 
       fetchResult: async function() {
         console.log('provided valid data');
-        console.log(`sending ${this.result}`);
-        console.log('sending data...');
+        console.log(`new result is ready to send: ${this.result}`);
+        console.log('record query timestamp');
+        let queryTime = new Date();
+        console.log(`query invoked at ${queryTime}`);
+        console.log('starting measuring execution time...');
+        let queryStart = Date.now();
+        console.log(`query time start: ${queryStart}`);
 
+        console.log('sending data...');
         let response = await fetch("/main/app/add", {
           method: 'POST',
           headers: {
@@ -363,15 +371,38 @@
           body: JSON.stringify(this.result)
         });
 
-        console.log('request sent checking if response is ok (201)');
+        console.log('request sent -- checking if response is ok (201)');
         if (response.status === 201) {
-        console.log('response is ok (201)');
-        await this.retrieve();
-        }else if (response.status === 403) {
-          console.log('access token expired');
+          console.log('response is ok (201 created)');
+          console.log('getting respond object from the server...');
+          try {
+            let json = await response.json();
+            if (json) {
+              let isHit = json.hit;
+              if (isHit !== undefined && isHit !== null) {
+                console.log('query evaluation finished');
+                console.log('stop measuring query execution time');
+                let queryFinish = Date.now();
+                let span = queryFinish - queryStart;
+                this.results.concat([{ date: queryTime, time: span, x: this.result.x, y: this.result.y, r: this.result.r, hit: isHit }]);
+              } else throw new Error('bad repond object [field "hit" not provided]');
+            } else {
+              let err = new Error('bad respond object [provided empty result]');
+              err.data = json;
+            }
+          } catch (e) {
+            console.error(e);
+            console.error(`bad respond object: ${e.data}`);
+          } finally {
+            console.log('fetching new result finished');
+          }
+        } else if (response.status == '403') {
+
+          console.error('access token expired');
+          console.log('fetching new token pair...');
           await this.fetchToken(this.fetchResult);
-        } else
-          console.log('bad response');
+
+        } else console.error(`bad response ${response.statusText}`);
         console.log(`response status: ${response.status}`);
       },
 
@@ -419,11 +450,11 @@
 
         console.log('=== total testing ===');
         if (errorMsg.length) {
-          console.log(`Errors[${errorMsg.length}]: ${errorMsg}`);
+          console.error(`Errors[${errorMsg.length}]: ${errorMsg}`);
           alert(errorMsg);
         } else {
-          console.log('fetching new result');
-          this.fetchResult();
+          console.log('fetching new result...');
+          await this.fetchResult();
         }
       },
 
@@ -463,7 +494,7 @@
           this.result.y = y;
 
           console.log('fetching new result');
-          this.fetchResult();
+          await this.fetchResult();
         }
       },
 
@@ -474,7 +505,7 @@
       },
 
       retrieve: async function() {
-        console.log('getting results with unique token');
+        console.log('getting results with unique token...');
 
         let response = await fetch("/main/app/dots/all", {
           method: 'POST',
@@ -488,25 +519,20 @@
         console.log('check if response is ok');
         if (response.ok) {
           console.log('response is ok');
-          console.log('getting the json object');
-          let json = response.json();
+          console.log('getting the json object...');
+          let json = await response.json();
           this.results = json;
-        } else if (response.status === 403) {
-          console.log('access token expired');
-          await this.fetchToken(this.retrieve)
-        } else {
-          console.log('bad response');
-          console.log(`response status: ${response.status}`);
-        }
+          drawDots(this.results);
+        } else if (response.status == '403') {
+          console.log('access token expired...');
+          await this.fetchToken(this.retrieve);
+        } else console.error(`bad response ${response.status} ${response.statusText}`);
         this.isLoading = false;
       },
     },
     mounted() {
       this.retrieve();
       this.redraw(this.radius);
-    },
-    updated() {
-      this.drawDots(this.results);
     },
     watch: {
       radius: function(value) {
