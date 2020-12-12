@@ -8,12 +8,12 @@
 
       <fieldset>
         <label>пароль</label>
-        <input type="password" placeholder="qwerty" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
+        <input type="password" placeholder="qwerty1234" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
       </fieldset>
 
       <fieldset class="separated">
-        <button @click="signin" title="Кнопка для входа в существующий аккаунт" class="btn">Войти</button>
-        <button @click="signup" title="Кнопка для создания нового аккаунта" class="btn">Зарегистрироваться</button>
+        <button @click="signin" title="Кнопка для входа в существующий аккаунт" :disabled="isNotFilled" class="btn">Войти</button>
+        <button @click="signup" title="Кнопка для создания нового аккаунта" :disabled="isNotFilled" class="btn">Зарегистрироваться</button>
       </fieldset>
     </div>
   </div>
@@ -29,7 +29,13 @@
           login: '',
           password: '',
         },
+        minPasswordLength: 10,
       };
+    },
+    computed: {
+      isNotFilled: function() {
+        return !(this.user.login !== undefined && this.user.login !== null && this.user.password !== undefined && this.user.password !== null && this.user.login.length > 0 && this.user.password.length >= this.minPasswordLength); 
+      },
     },
     methods: {
       signin: async function(event) {
@@ -160,6 +166,10 @@
     color: #eaeaea;
     font-family: 'Pacifico', cursive;
     font-size: 18px;
+  }
+
+  #loging .btn:disabled {
+    background-color: #5e808f;
   }
 
   .btn:hover {

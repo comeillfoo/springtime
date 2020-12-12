@@ -32,7 +32,7 @@
             </select>
           </fieldset>
           <fieldset class="inlines__align--center">
-            <button @click.prevent="check" class="btn">проверить</button>
+            <button @click.prevent="check" :disabled="isNotChecked" class="btn">проверить</button>
           </fieldset>
         </form>
       </div>
@@ -78,6 +78,9 @@
       radius: function() {
         return this.result.r;
       },
+      isNotChecked: function() {
+        return !(this.result.x !== undefined && this.result.x !== null && this.result.x.length > 0 && this.result.y !== undefined && this.result.y !== null && this.result.y.length > 0 && this.result.r !== undefined && this.result.r !== null && this.result.r.length > 0);
+      }
     },
     methods: {
       translateTo: function(realCoordinate, fieldSize, length, proportion) {
@@ -534,12 +537,9 @@
     padding: 0 10%;
   }
 
-  /**
-   * form 
-   */
-
-  form
-
+  #basic .btn:disabled {
+    background-color: #5e808f;
+  }
 
   .btn:hover {
     background-color: #5e808f;

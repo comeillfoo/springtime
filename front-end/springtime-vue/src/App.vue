@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <logo />
-    <basic :access="accessTokenName" :refresh="refreshTokenName" />
-    <startup :access="accessTokenName" :refresh="refreshTokenName" />
+    <basic :access="accessTokenName" :refresh="refreshTokenName" v-if="isAuthorized"/>
+    <startup :access="accessTokenName" :refresh="refreshTokenName" v-else />
     <hat v-if="!isAuthorized"/>
     <basement/>
   </div>
