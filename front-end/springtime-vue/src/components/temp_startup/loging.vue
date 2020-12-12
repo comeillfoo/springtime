@@ -10,7 +10,7 @@
         <label>пароль</label>
         <input type="password" placeholder="qwerty1234" title="пароль" v-model="user.password" required="true" autocomplete="current-password">
       </fieldset>
-
+          <a id="err_message" ></a>
       <fieldset class="separated">
         <button @click="signin" title="Кнопка для входа в существующий аккаунт" :disabled="isNotFilled" class="btn">Войти</button>
         <button @click="signup" title="Кнопка для создания нового аккаунта" :disabled="isNotFilled" class="btn">Зарегистрироваться</button>
@@ -38,6 +38,10 @@
       },
     },
     methods: {
+        createMessage: async function(message) {
+            let field = document.getElementById('err_message');
+            field.innerText = message;
+        },
       signin: async function(event) {
         console.log('sign in account:');
         console.log(`user: ${this.user}`);
@@ -69,6 +73,10 @@
                 window.location.reload();
             });
           }
+        }else {
+            response.json().then(data => {
+                this.createMessage(`*${data.description}`);
+            });
         }
       },
 
@@ -105,6 +113,10 @@
                   window.location.reload();
               });
           }
+        }else {
+            response.json().then(data => {
+                this.createMessage(`*${data.description}`);
+            });
         }
       },
     }
@@ -140,7 +152,7 @@
   }
 
   #login-form label {
-    padding: 5%;
+    padding: 0 5% ;
     color: #3e606f;
     font-family: Satisfy,Lato,Open Sans,Roboto,sans-serif;
     text-transform: capitalize;
@@ -152,6 +164,13 @@
     border: 1px solid #fff;
     border-radius: 5px;
     margin: 1% 1%;
+  }
+
+  #err_message {
+      font-size: 100%;
+      font-style: italic;
+      margin-left: 10%;
+      color: #cd1a21
   }
 
   .btn {
@@ -178,6 +197,23 @@
 
   .separated {
     text-align: center;
+  }
+
+  @media only all and (min-width: 643px) and (max-width: 1244px) {
+      #login-form {
+          display: block;
+          height: 100%;
+          width: 100%;
+      }
+
+      #login-form label {
+          font-size: 160%;
+      }
+
+
+      #loging {
+          width: 50%;
+      }
   }
 
   @media only all and (max-width: 642px) {
