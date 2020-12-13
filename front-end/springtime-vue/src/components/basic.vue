@@ -76,6 +76,7 @@
           refresh: '/api/refresh/token',
           retrieve: '/main/app/dots/all',
         },
+        counter: 4,
       };
     },
     computed: {
@@ -405,12 +406,17 @@
           // console.log('redirecting to login page...');
           // this.signout();
 
-        } else console.error(`bad response ${response.statusText}`);
+        } else {
+          console.error(`bad response ${response.statusText} : ${response.status}`);
+          // plug for testing basic drawing
+          // this.results = this.results.concat([{ x: this.result.x, y: this.result.y, r: this.result.r, hit: true }]);
+        }
         console.log(`response status: ${response.status}`);
       },
 
       drawDots: function(results) {
-        // this.redraw(this.radius);
+        this.redraw(this.radius);
+
         console.log(`previous results: ${ results }`);
         if (!results.length)
           console.log('no any results in the table');
@@ -422,10 +428,14 @@
           let width = canvas.width;
           let height = canvas.height;
           let counter = out;
-          for (let i = results.length - 1; i > 0; --i) {
+          for (let i = results.length - 1; i >= 0; --i) {
             console.log(`putting dot: ${results[i]}`);
             console.log(`x: ${ results[i].x }; y: ${ results[i].y }`);
             ctx.fillStyle = results[i].hit? "#000000" : "#cd0000";
+
+            ctx.globalAlpha = 1 - 1 / counter;
+            console.log(`counter: ${ counter }; alpha set to: ${ ctx.globalAlpha }`);
+
             console.log('translating coordinates');
             const realX = this.translateFrom(results[i].x, width, maxRadius, part);
             const realY = this.translateFrom(-results[i].y, height, maxRadius,part);
@@ -437,9 +447,46 @@
             ctx.fill();
             ctx.stroke();
             ctx.closePath();
-            if (--counter === 0) break
+
+            ctx.globalAlpha = 1.0;
+            console.log(`counter: ${ counter }; alpha restored to: ${ ctx.globalAlpha }`);
+            if (--counter === 0) break;
           }
         }
+      },
+
+      drawDot: function(result) {
+        console.log(`previous result: ${ result }`);
+
+        console.log('preparing canvas variables...');
+        let canvas = this.$refs.area;
+        let ctx = canvas.getContext('2d');
+        let width = canvas.width;
+        let height = canvas.height;
+
+        console.log(`checking if more than ${ this.out } dots drawn`);
+        if (!this.counter) {
+          console.log('redrawing canvas...');
+          this.redraw(result.r);
+        }
+
+        console.log(`dot.x: ${ result.x }; dot.y: ${ result.y }`);
+        ctx.fillStyle = result.hit? "#000000" : "#cd0000";
+
+        console.log('translating dot coordinates');
+        const realX = this.translateFrom(result.x, width, maxRadius, part);
+        const realY = this.translateFrom(-result.y, height, maxRadius, part);
+        console.log(`dot coordinates translated to (x: ${ realX }; y: ${ realY })`);
+
+        console.log('putting dot...');
+        ctx.beginPath();
+        ctx.arc(realX, realY, width * part / 100, 0, 2*Math.PI, true);
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+        console.log('dot put -- decrease counter');
+        this.counter = (this.counter - 1) % 5;
+
       },
 
       check: async function(event) {
@@ -501,6 +548,9 @@
 
           console.log('fetching new result');
           await this.fetchResult();
+          // let last = this.results[this.results.length - 1];
+          // console.log(`get last element ${ last }`);
+          // this.drawDot(last);
           this.drawDots(this.results);
         }
       },
