@@ -57,10 +57,11 @@
           body: JSON.stringify(this.user)
         });
 
+        let json = await response.json();
+
         console.log('check if response is ok (200)');
         if (response.ok) {
           console.log('response 200; get token');
-          let json = await response.json();
           console.log(`response body: ${json}`);
           if (!json) {
             console.log('bad data: expected { accessToken, refreshToken }');
@@ -74,7 +75,7 @@
 
             window.location.reload();
           }
-        } else this.createMessage(`*Error: ${response.statusText} ${response.status}`);
+        } else this.createMessage(`*${json.description}`);
       },
 
       signup: async function(event) {
@@ -93,9 +94,10 @@
         console.log('sent request');
         console.log('check if status 201');
 
+        let json = await response.json();
+
         if (response.status === 201) {
-          console.log('user created');
-          let json = await response.json();
+            console.log('user created');
           console.log(`response body: ${json}`);
           if (!json)
             console.log('bad data: expected { accessToken, refreshToken }');
@@ -108,7 +110,9 @@
 
             window.location.reload();
           }
-        } else this.createMessage(`*Error: ${response.statusText} ${response.status}`);
+        } else {
+            this.createMessage(`*${json.description}`);
+        }
       },
     }
   }
