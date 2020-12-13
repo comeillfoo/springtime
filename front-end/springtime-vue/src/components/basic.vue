@@ -345,7 +345,7 @@
           console.log('successful fetching new token');
           console.log('getting json object...');
           let json = await response.json();
-          if (!json) {
+          if (json) {
             this.$session.set(this.access, json.accessToken);
             window.location.reload();
             repeat = repeat.bind(this);
@@ -397,6 +397,8 @@
           console.error('access token expired');
           console.log('fetching new token pair...');
           await this.fetchToken(this.fetchResult);
+          // console.log('redirecting to login page...');
+          // this.signout();
 
         } else console.error(`bad response ${response.statusText}`);
         console.log(`response status: ${response.status}`);
@@ -407,7 +409,7 @@
         if (!results.length)
           console.log('no any results in the table');
         else {
-          this.result.r = results[0].r;
+          // this.result.r = results[0].r;
           const out = 5;
           let canvas = this.$refs.area;
           let ctx = canvas.getContext('2d');
@@ -522,7 +524,11 @@
         } else if (response.status == '403') {
           console.log('access token expired...');
           await this.fetchToken(this.retrieve);
-        } else console.error(`bad response ${response.status} ${response.statusText}`);
+        } else {
+          // plug for testing table
+          // this.results = [ {x: 1, y: '4.9999999999999999999999999999999', r: 2, hit: true }];
+          console.error(`bad response ${response.status} ${response.statusText}`);
+        }
         this.isLoading = false;
       },
     },

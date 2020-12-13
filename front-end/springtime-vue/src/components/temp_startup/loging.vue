@@ -89,7 +89,13 @@
       },
 
       signup: async function(event) {
-        
+
+        // plug for testing buttons uncomment next 4 lines
+        // this.$session.set(this.access, '0123456789');
+        // this.$session.set(this.refresh, '0123456789');
+        // window.location.reload();
+        // return;
+
         console.log('sign up new account:');
         console.log(`user: ${this.user}`);
         

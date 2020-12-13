@@ -13,7 +13,7 @@
       <tbody class="table__body">
         <tr v-for="result in results">
           <td><div class="scrollable">{{ result.x }}</div></td>
-          <td><div class="scrollable special-width">{{ result.y }}</div></td>
+          <td class="special-width"><div class="scrollable special-width">{{ result.y }}</div></td>
           <td><div class="scrollable">{{ result.r }}</div></td>
           <td><div class="scrollable">{{ result.hit? 'yes' : 'no' }}</div></td>
         </tr>
@@ -103,21 +103,25 @@
 
   @media only all and (min-width: 1245px) {
     .special-width {
-      width: 128px;
+      width: 480px;
+      margin: 0;
     }
 
     .table__head th {
       font-size: 16px;
+      border-right: 1px solid rgba(0, 0, 0, 0.5);
     }
 
     .table__body td {
       font-size: 16px;
+      border-right: 1px solid rgba(0, 0, 0, 0.5);
     }
   }
 
   @media only all and (min-width: 643px) and (max-width: 1244px) {
     .special-width {
-      width: 64px;
+      width: 360px;
+      margin: 0;
     }
 
     .table__head th {
@@ -131,7 +135,8 @@
 
   @media only all and (max-width: 642px) {
     .special-width {
-      width: 32px;
+      width: 60px;
+      margin: 0;
     }
 
     .table__head th {
