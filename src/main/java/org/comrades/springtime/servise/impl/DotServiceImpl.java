@@ -25,29 +25,29 @@ public class DotServiceImpl implements DotService {
 
     @Override
     public boolean checkDots(Dot dot) {
-        Integer x = dot.getX();
+        Double x = dot.getX();
         Double y = dot.getY();
-        Integer r = dot.getR();
+        Double r = dot.getR().doubleValue();
 
-        if (x >= 0 && y >= 0 && (-x + r >= y)) {
-            dot.setIsHit(true);
+        if (x >= 0 && y >= 0 && (-2*x + r >= y)) {
+            dot.setHit(true);
             return true;
         }
-        if (x <= 0 && y <= 0 && x >= r && y >= r/2) {
-            dot.setIsHit(true);
+        else if (x <= 0 && y <= 0 && x >= -r && y >= -r/2) {
+            dot.setHit(true);
             return true;
         }else if (x >= 0 && y <= 0 && (Math.pow(x, 2) + Math.pow(y, 2)) <= Math.pow(r/2, 2)) {
-            dot.setIsHit(true);
+            dot.setHit(true);
             return true;
         }else {
-            dot.setIsHit(false);
+            dot.setHit(false);
             return false;
         }
     }
 
     @Override
     public Dot validate(DotBaseEntity dot) throws NumberFormatException {
-        Integer x = dot.getX();
+        Double x = dot.getX();
         Double y = dot.getY();
         Integer r = dot.getR();
 

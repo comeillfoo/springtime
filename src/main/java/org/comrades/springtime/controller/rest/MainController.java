@@ -51,7 +51,7 @@ public class MainController {
 
         dot.setUser(null);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonList(dot));
+        return ResponseEntity.status(HttpStatus.CREATED).body(dot);
     }
 
     @PostMapping("/clear")

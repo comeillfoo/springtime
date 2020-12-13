@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class DotDto {
-    private Integer x;
+    private Double x;
     private Double y;
     private Integer r;
 }

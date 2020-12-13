@@ -13,11 +13,11 @@ public abstract class DotBaseEntity {
 
 
     @Column(name = "x_value")
-    private Integer x;
+    private Double x;
     @Column(name = "y_value")
     private Double y;
     @Column(name = "r_value")
     private Integer r;
     @Column(name = "is_hit", columnDefinition = "NUMBER(1)")
-    private Boolean isHit;
+    private Boolean hit;
 }

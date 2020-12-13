@@ -6,6 +6,7 @@ import org.comrades.springtime.module.requested.RefreshTokenDto;
 import org.comrades.springtime.security.jwt.TokenHandler;
 import org.comrades.springtime.servise.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,14 +44,15 @@ public class RefreshTokenController {
             if (user.getName().equals(tokenUserName)) {
                 String accessToken = tokenHandler.generateAccessToken(user);
 
-                response.put("token", accessToken);
+                response.put("accessToken", accessToken);
 
                 return ResponseEntity.ok(response);
             }
 
             throw new UserNotFoundException("Divergent indications");
         }catch (UserNotFoundException ex) {
-            throw new BadCredentialsException("Invalid refreshToken");
+//            throw new BadCredentialsException("Invalid refreshToken");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 

@@ -3,47 +3,46 @@
 
     <div id="top-container">
 
-      <div id="area-container" class="inlines__align--center">
-        <h4 class="text__title">Рабочая область</h4>
-        <div id="area-subcontainer">
-          <canvas id="area" ref="area" width="600" height="600" @click="checkArea">
-            Canvas not supported
-          </canvas>
+        <div id="area-container" class="inlines__align--center">
+          <div id="area-subcontainer">
+            <canvas id="area" ref="area" width="600" height="600" @click="checkArea">
+              Canvas not supported
+            </canvas>
+          </div>
         </div>
-      </div>
 
-      <div id="form-container">
-        <h4 class="text__title">Форма</h4>
-        <form id="result">
-          <fieldset ref="x" title="Значение параметра x должно быть целым числом в пределах -4 до 4">
-            <label>x</label>
-            <select v-model="result.x" required="true">
-              <option v-for="value in xValues" >{{ value }}</option>
-            </select>
-          </fieldset>
-          <fieldset ref="y" title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
-            <label>y</label>
-            <input type="text" placeholder="y in (-5, 5)" v-model="result.y" required="true" />
-          </fieldset>
-          <fieldset ref="r" title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
-            <label>r</label>
-            <select v-model="result.r" required="true">
-              <option v-for="value in xValues">{{ value }}</option>
-            </select>
-          </fieldset>
-          <fieldset class="inlines__align--center">
-            <button @click.prevent="check" :disabled="isNotChecked" class="btn">проверить</button>
-          </fieldset>
-        </form>
-      </div>
+        <div id="form-container">
+          <form id="result">
+            <fieldset ref="x" title="Значение параметра x должно быть целым числом в пределах -4 до 4">
+              <label>x</label>
+              <select v-model="result.x" required="true">
+                <option v-for="value in xValues" >{{ value }}</option>
+              </select>
+            </fieldset>
+            <fieldset ref="y" title="Значение параметра y должно быть действительным число в интервале от -5 до 5">
+              <label>y</label>
+              <input type="text" placeholder="y in (-5, 5)" v-model="result.y" required="true" />
+            </fieldset>
+            <fieldset ref="r" title="Значение параметра r должно быть целым числом в пределах от 1 до 4">
+              <label>r</label>
+              <select v-model="result.r" required="true">
+                <option v-for="value in xValues">{{ value }}</option>
+              </select>
+            </fieldset>
+            <fieldset class="inlines__align--center">
+              <button @click.prevent="check" class="btn">проверить</button>
+            </fieldset>
+          </form>
+        </div>
 
     </div>
 
     <loader v-if="isLoading" /><resultscontainer v-bind:results="results" v-else-if="results.length" />
     <p class="empty-results" v-else>результаты отсутствуют</p>
-    <div id="close-container" class="inlines__align--center">
-      <button @click="signout" class="btn">закрыть сессию</button>
-    </div>
+
+<!--    <div id="close-container" class="inlines__align&#45;&#45;center">-->
+<!--      <button @click="signout" class="btn">закрыть сессию</button>-->
+<!--    </div>-->
 
   </div>
 </template>
@@ -353,7 +352,13 @@
             repeat(args);
           } else console.error('empty response body');
 
-        } else console.error(`bad response ${response.status} ${response.statusText}`);
+        } else {
+          console.error(`bad response ${response.status} ${response.statusText}`);
+
+          console.log('redirecting to login-page...');
+
+          this.signout();
+        }
       },
 
       fetchResult: async function() {
@@ -405,6 +410,7 @@
       },
 
       drawDots: function(results) {
+        // this.redraw(this.radius);
         console.log(`previous results: ${ results }`);
         if (!results.length)
           console.log('no any results in the table');
@@ -415,7 +421,8 @@
           let ctx = canvas.getContext('2d');
           let width = canvas.width;
           let height = canvas.height;
-          for (let i = 0; i < results.length; ++i) {
+          let counter = out;
+          for (let i = results.length - 1; i > 0; --i) {
             console.log(`putting dot: ${results[i]}`);
             console.log(`x: ${ results[i].x }; y: ${ results[i].y }`);
             ctx.fillStyle = results[i].hit? "#000000" : "#cd0000";
@@ -430,6 +437,7 @@
             ctx.fill();
             ctx.stroke();
             ctx.closePath();
+            if (--counter === 0) break
           }
         }
       },
@@ -493,6 +501,7 @@
 
           console.log('fetching new result');
           await this.fetchResult();
+          this.drawDots(this.results);
         }
       },
 
@@ -520,7 +529,6 @@
           console.log('getting the json object...');
           let json = await response.json();
           this.results = json;
-          this.drawDots(this.results);
         } else if (response.status == '403') {
           console.log('access token expired...');
           await this.fetchToken(this.retrieve);
@@ -531,8 +539,17 @@
         }
         this.isLoading = false;
       },
+      createExitButton: function() {
+        let exitButton = document.createElement("BUTTON");
+        exitButton.innerHTML = 'Выйти';
+        exitButton.setAttribute('class', 'btn logo_btn');
+        exitButton.onclick = this.signout;
+        let logo = document.getElementById('logo_btn');
+        logo.appendChild(exitButton);
+      },
     },
     mounted() {
+      this.createExitButton();
       this.retrieve();
       this.redraw(this.radius);
     },
@@ -551,7 +568,6 @@
   #basic {
     width: 100%;
     padding: 0;
-    margin-top: 10vh;
   }
 
   /**
@@ -559,14 +575,23 @@
    */
 
   #top-container {
-    width:100%
+    width: 100%;
+    min-height: 100vh;
+    margin-top: 10vh;
   }
   #area-container {
-    padding: 0 10%;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,.3);
+    margin: 0 auto;
+    min-width: 600px;
+    min-height: 600px;
   }
 
-  #basic .btn:disabled {
-    background-color: #5e808f;
+  #form-container {
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,.3);
+    width: 30%;
+    margin: 10% 2%;
   }
 
   .btn:hover {
@@ -574,25 +599,34 @@
   }
 
   #result input, select {
-    border: 1px solid #c6c9cc;
-    border-radius: 5px;
+    border: 2px solid #c6c9cc;
+    border-radius: 3px;
     color: #555;
     display: block;
-    margin: 1% 0 4% 0;
-    padding: 1% 2%;
+    padding: 1% 3%;
+    min-width: 100%;
+    min-height: 30px;
+    font-size: 120%;
+    margin-top: 10px;
+  }
+
+  #result option {
+    font-size: 15px;
   }
 
   #result label {
     color: #3e606f;
     font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
+    font-weight: bold;
     text-transform: capitalize;
   }
 
   #result fieldset {
-    border: 1px solid #c6c9cc;
+    border: 0px solid #c6c9cc;
     border-radius: 5px;
     margin: 2% 0;
     width: 100%;
+    padding: 3% 10%;
   }
 
   /**
@@ -626,30 +660,41 @@
     font-family: Lato, Roboto, "Open Sans", Helvetica, sans-serif;
   }
 
+  #area {
+    border: 0px solid #c6c9cc;
+  }
+
   @media only all and (min-width: 1245px) {
 
+    .top-shell {
+      width: 35%;
+      display: inline-block;
+
+    }
+
     #area-subcontainer {
-      width: 100%;
-      height: 100%;
+      max-height: 600px;
+      max-width: 600px;
     }
 
     #area-container {
       display: inline-block;
+      margin: 5% 15% 0 0;
       float: right;
-      width: auto;
-      height: auto;
-      padding-top: 5%;
     }
 
     #form-container {
       display: inline-block;
-      width: 40%;
-      padding: 10% 0 10% 10%;
+      float: right;
     }
 
     #top-container {
       vertical-align: top;
       display: table;
+    }
+
+    #result label {
+      font-size: 120%;
     }
   }
 
@@ -661,7 +706,7 @@
     }
 
     .btn {
-      font-size: 14px;
+      font-size: 120%;
     }
 
     .empty-results {
@@ -672,21 +717,35 @@
     #form-container {
       display: block;
       margin: 0 auto;
-      width: 45%;
+      width: 60%;
+    }
+
+
+    #area-container {
+      max-height: 600px;
+      max-width: 600px;
     }
 
     #area-subcontainer {
-      width: 100%;
-      height: 100%;
+      max-height: 600px;
+      max-width: 600px;
     }
 
     #area-container {
       display: block;
       margin: 0 auto;
     }
+
+    #result label {
+      font-size: 120%;
+    }
   }
 
   @media only all and (max-width: 642px) {
+
+    .btn {
+      font-size: 100%;
+    }
 
     .empty-results {
       font-size: 12px;
@@ -706,17 +765,25 @@
 
     #area-container {
       display: block;
-      margin: 8% auto;
+      margin: 0 auto;
+      min-width: 320px;
+      min-height: 320px;
+      max-height: 320px;
+      max-width: 320px;
     }
 
     #area {
-      width: 320px;
-      height: 320px;
+      max-width: 320px;
+      max-height: 320px;
     }
 
     #top-container {
       width: 95%;
       margin: 8% auto;
+    }
+
+    #result label {
+      font-size: 85%;
     }
   }
 </style>
