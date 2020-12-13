@@ -3,8 +3,6 @@
     <table id="results">
       <thead class="table__head">
         <tr>
-          <th>дата</th>
-          <th>время</th>
           <th>x</th>
           <th>y</th>
           <th>r</th>
@@ -14,8 +12,6 @@
 
       <tbody class="table__body">
         <tr v-for="result in results">
-          <td><div class="scrollable">{{ result.date.toLocaleString('ru', dateOptions) }}</div></td>
-          <td><div class="scrollable">{{ result.time }}</div></td>
           <td><div class="scrollable">{{ result.x }}</div></td>
           <td><div class="scrollable special-width">{{ result.y }}</div></td>
           <td><div class="scrollable">{{ result.r }}</div></td>

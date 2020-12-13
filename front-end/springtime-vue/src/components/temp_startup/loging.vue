@@ -30,6 +30,10 @@
           password: '',
         },
         minPasswordLength: 8,
+        queries: {
+          signin: 'api/aunt/sign_in',
+          register: 'api/aunt/register',
+        },
       };
     },
     computed: {
@@ -49,7 +53,7 @@
         console.log(`user: ${this.user}`);
 
         console.log('fetching tokens from server...');
-        let response = await fetch("api/aunt/sign_in", {
+        let response = await fetch(this.queries.signin, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -57,7 +61,13 @@
           body: JSON.stringify(this.user)
         });
 
-        let json = await response.json();
+        let json = null;
+        try {
+          json = await response.json();
+        } catch (e) {
+          console.error(e);
+          return;
+        }
 
         console.log('check if response is ok (200)');
         if (response.ok) {
@@ -79,11 +89,12 @@
       },
 
       signup: async function(event) {
+        
         console.log('sign up new account:');
         console.log(`user: ${this.user}`);
         
         console.log('fetching tokens from server...');
-        let response = await fetch('api/aunt/register', {
+        let response = await fetch(this.queries.register, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json;charset=utf-8',
@@ -94,11 +105,17 @@
         console.log('sent request');
         console.log('check if status 201');
 
-        let json = await response.json();
+        let json = null;
+        try {
+          json = await response.json();
+        } catch (e) {
+          console.error(e);
+          return;
+        }
 
         if (response.status === 201) {
             console.log('user created');
-          console.log(`response body: ${json}`);
+          console.log(`response body: ${JSON.stringify(json)}`);
           if (!json)
             console.log('bad data: expected { accessToken, refreshToken }');
           else {
