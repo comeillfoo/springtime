@@ -450,7 +450,7 @@
 
             ctx.globalAlpha = 1.0;
             console.log(`counter: ${ counter }; alpha restored to: ${ ctx.globalAlpha }`);
-            if (--counter === 0) break;
+            if (++counter === 5) break;
           }
         }
       },
@@ -485,7 +485,7 @@
         ctx.stroke();
         ctx.closePath();
         console.log('dot put -- decrease counter');
-        this.counter = (this.counter - 1) % 5;
+        this.counter = (this.counter + 1) % 5;
 
       },
 
