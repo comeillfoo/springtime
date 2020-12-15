@@ -1,4 +1,4 @@
-package org.comrades.springtime.controller.rest;
+package org.comrades.springtime.controllers.rest;
 
 import org.comrades.springtime.customExceptions.UserNotFoundException;
 import org.comrades.springtime.module.User;

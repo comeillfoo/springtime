@@ -56,8 +56,9 @@
     font-family: Inconsolata, "Anonymous Pro", "Ubuntu Mono", "Lucida Console", Consolas, "Courier New", Courier, monospace;
     font-size: 18px;
     margin: 2% auto;
-    border: 1px solid #3e606f;
-    border-radius: 5px;
+    /*border: 1px solid #3e606f;*/
+    /*border-radius: 5px;*/
+    box-shadow: 0 0 10px rgba(0,0,0,.3);
   }
 
   #results {
@@ -140,11 +141,11 @@
     }
 
     .table__head th {
-      font-size: 8px;
+      font-size: 10px;
     }
 
     .table__body td {
-      font-size: 8px;
+      font-size: 10px;
     }
   }
 </style>

@@ -415,6 +415,10 @@
       },
 
       drawDots: function(results) {
+        if (this.counter !=4) {
+          this.counter +=1;
+        }
+
         this.redraw(this.radius);
 
         console.log(`previous results: ${ results }`);
@@ -422,18 +426,21 @@
           console.log('no any results in the table');
         else {
           // this.result.r = results[0].r;
-          const out = 5;
+          // const out = 5;
           let canvas = this.$refs.area;
           let ctx = canvas.getContext('2d');
           let width = canvas.width;
           let height = canvas.height;
-          let counter = out;
+          let counter = this.counter;
+
           for (let i = results.length - 1; i >= 0; --i) {
+            if (results[i].r != this.radius) continue;
+            if (counter-- === 0) break;
             console.log(`putting dot: ${results[i]}`);
             console.log(`x: ${ results[i].x }; y: ${ results[i].y }`);
             ctx.fillStyle = results[i].hit? "#000000" : "#cd0000";
 
-            ctx.globalAlpha = 1 - 1 / counter;
+            ctx.globalAlpha = 1 - 1 / counter + 1;
             console.log(`counter: ${ counter }; alpha set to: ${ ctx.globalAlpha }`);
 
             console.log('translating coordinates');
@@ -450,7 +457,7 @@
 
             ctx.globalAlpha = 1.0;
             console.log(`counter: ${ counter }; alpha restored to: ${ ctx.globalAlpha }`);
-            if (++counter === 5) break;
+
           }
         }
       },
@@ -605,7 +612,9 @@
     },
     watch: {
       radius: function(value) {
-        this.redraw(this.radius);
+        this.counter = -1;
+        this.drawDots(this.results)
+        // this.redraw(this.radius);
       },
     }
   }
