@@ -1,5 +1,7 @@
 package org.comrades.springtime.mbeans;
 
+
+import javafx.util.Pair;
 import org.comrades.springtime.module.Dot;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.servise.DotService;
@@ -12,32 +14,34 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @ManagedResource(
-    objectName="PD:category=MBeans, name=areaDeterminantMBean",
-    description="Managed Bean for determining the area of last user and its last query"
+    objectName="PD:category=MBeans, name=dotsCounterMBean",
+    description="Managed Bean for counting dots that out of area and dots at all"
 )
-@Component( "areaDeterminantMBean" )
-public class AreaDeterminantMBean {
+@Component( "dotsCounterMBean" )
+public class DotsCounterMBean {
   private DotService dotService;
   private UserService userService;
 
   @Autowired
-  public AreaDeterminantMBean( DotService dotService, UserService userService ) {
+  public DotsCounterMBean( DotService dotService, UserService userService ) {
     this.dotService = dotService;
     this.userService = userService;
   }
 
-  private double area( double radius ) {
-    return radius * radius * 0.94634954084936207740375;
-  }
-
   @ManagedOperation
-  public double getTheResultingArea() {
+  public Pair<Long, Long> countDots() {
     final User online = userService.getCurrentUser();
-    if ( null == online ) return 0.0;
+    if ( null == online )
+      return new Pair<>( 0L, 0L );
 
     final List<Dot> dots = dotService.getDotsByUser( online );
-    if ( dots.isEmpty() )
-      return 0.0;
-    else return area( ( double ) dots.get( dots.size() - 1 ).getR() );
+    if ( null == dots )
+      return new Pair<>( 0L, 0L );
+
+    final Long total = ( long ) dots.size();
+    // TODO: write notifications
+    final Long notHit = dots.parallelStream().filter( ( dot )->( !dot.getHit() ) ).count();
+
+    return new Pair<>( total, notHit );
   }
 }
