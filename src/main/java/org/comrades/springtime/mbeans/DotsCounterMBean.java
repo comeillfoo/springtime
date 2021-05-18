@@ -1,7 +1,6 @@
 package org.comrades.springtime.mbeans;
 
 
-import javafx.util.Pair;
 import org.comrades.springtime.module.Dot;
 import org.comrades.springtime.module.User;
 import org.comrades.springtime.servise.DotService;
