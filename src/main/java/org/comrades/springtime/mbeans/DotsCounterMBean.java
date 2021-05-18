@@ -34,16 +34,14 @@ public class DotsCounterMBean implements NotificationPublisherAware {
   }
 
   @ManagedOperation
-  public Pair<Long, Long> countDots() {
+  public Long countNotHitDots() {
     final User online = userService.getCurrentUser();
     if ( null == online )
-      return new Pair<>( 0L, 0L );
+      return 0L;
 
     final List<Dot> dots = dotService.getDotsByUser( online );
     if ( null == dots )
-      return new Pair<>( 0L, 0L );
-
-    final Long total = ( long ) dots.size();
+      return 0L;
 
     // get the not hit dots
     List<Dot> notHitDots = dots.parallelStream().filter( ( dot )->( !dot.getHit() ) ).collect( Collectors.toList());
@@ -59,8 +57,20 @@ public class DotsCounterMBean implements NotificationPublisherAware {
               String.format( "точка ( %f %f ) за пределами области[ R = %d ]", dot.getX(), dot.getY(), dot.getR() ) )
       );
     } );
+    return notHit;
+  }
 
-    return new Pair<>( total, notHit );
+  @ManagedOperation
+  public Long countTotalDots() {
+    final User online = userService.getCurrentUser();
+    if ( null == online )
+      return 0L;
+
+    final List<Dot> dots = dotService.getDotsByUser( online );
+    if ( null == dots )
+      return 0L;
+
+    return ( long ) dots.size();
   }
 
   @Override
